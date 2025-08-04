@@ -1,0 +1,6 @@
+# Commands to run after creating GitHub repository
+# Replace 'yourusername' with your actual GitHub username
+
+git remote add origin https://github.com/yourusername/kin-workspace.git
+git branch -M main
+git push -u origin main
