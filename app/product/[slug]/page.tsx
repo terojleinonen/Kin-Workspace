@@ -8,6 +8,7 @@ import { useCart } from '@/app/contexts/CartContext'
 import { useProduct } from '@/app/lib/api-hooks'
 import { formatPrice } from '@/app/lib/cart-utils'
 import { ProductVariant } from '@/app/lib/product-data'
+import ReviewsSection from '@/app/components/reviews/ReviewsSection'
 
 interface ProductPageProps {
   params: Promise<{
@@ -356,6 +357,11 @@ export default function ProductPage({ params }: ProductPageProps) {
               Add to Wishlist
             </button>
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-16 pt-16 border-t border-warm-beige">
+          <ReviewsSection productId={product.id} />
         </div>
       </div>
     </div>

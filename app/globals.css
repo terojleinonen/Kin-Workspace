@@ -35,4 +35,6 @@
   .color-swatch {
     background-color: var(--swatch-color, #ccc);
   }
+  
+
 }

@@ -92,3 +92,60 @@ export interface AuthResponse {
   token?: string
   error?: string
 }
+
+// Review Types
+export interface Review {
+  id: string
+  productId: string
+  userId: string
+  userName: string
+  rating: number
+  title: string
+  comment: string
+  createdAt: string
+  updatedAt: string
+  verified: boolean
+  helpful: number
+  photos?: string[]
+}
+
+export interface ReviewFormData {
+  productId: string
+  rating: number
+  title: string
+  comment: string
+  photos: string[]
+}
+
+export interface ReviewSummary {
+  averageRating: number
+  totalReviews: number
+  ratingDistribution: {
+    5: number
+    4: number
+    3: number
+    2: number
+    1: number
+  }
+  verifiedReviews: number
+}
+
+export interface ReviewContextType {
+  reviews: Review[]
+  reviewSummary: ReviewSummary | null
+  isLoading: boolean
+  submitReview: (reviewData: ReviewFormData) => Promise<{ success: boolean; error?: string }>
+  updateHelpful: (reviewId: string) => Promise<{ success: boolean; error?: string }>
+  fetchReviews: (productId: string, options?: ReviewFetchOptions) => Promise<void>
+}
+
+export interface ReviewFetchOptions {
+  page?: number
+  limit?: number
+  sortBy?: 'date' | 'rating' | 'helpful'
+  filterBy?: {
+    rating?: number
+    verified?: boolean
+    withPhotos?: boolean
+  }
+}
