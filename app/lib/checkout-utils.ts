@@ -1,5 +1,5 @@
-import { Cart } from './types'
-import { OrderSummary } from './checkout-types'
+import { Cart, CartItem } from './types'
+import { OrderSummary, ShippingInfo, BillingInfo, PaymentInfo } from './checkout-types'
 
 export const calculateOrderSummary = (cart: Cart, shippingCost = 0, discountAmount = 0): OrderSummary => {
   const subtotal = cart.total
@@ -98,4 +98,148 @@ export const getEstimatedDelivery = (shippingMethod: string = 'standard'): Date 
   const deliveryDays = shippingMethod === 'express' ? 2 : 7
   now.setDate(now.getDate() + deliveryDays)
   return now
+}
+
+// Additional functions needed for tests
+export const validateShippingInfo = (info: ShippingInfo): { valid: boolean; errors: Record<string, string> } => {
+  const errors: Record<string, string> = {}
+
+  if (!info.firstName?.trim()) errors.firstName = 'First name is required'
+  if (!info.lastName?.trim()) errors.lastName = 'Last name is required'
+  if (!info.email?.trim()) errors.email = 'Email is required'
+  else if (!validateEmail(info.email)) errors.email = 'Please enter a valid email address'
+  if (!info.phone?.trim()) errors.phone = 'Phone number is required'
+  else if (!validatePhone(info.phone)) errors.phone = 'Please enter a valid phone number'
+  if (!info.address?.trim()) errors.address = 'Address is required'
+  if (!info.city?.trim()) errors.city = 'City is required'
+  if (!info.state?.trim()) errors.state = 'State is required'
+  if (!info.zipCode?.trim()) errors.zipCode = 'ZIP code is required'
+  else if (!validateZipCode(info.zipCode, info.country)) errors.zipCode = 'Please enter a valid ZIP code'
+  if (!info.country?.trim()) errors.country = 'Country is required'
+
+  return { valid: Object.keys(errors).length === 0, errors }
+}
+
+export const validateBillingInfo = (info: BillingInfo): { valid: boolean; errors: Record<string, string> } => {
+  const errors: Record<string, string> = {}
+
+  if (!info.firstName?.trim()) errors.firstName = 'First name is required'
+  if (!info.lastName?.trim()) errors.lastName = 'Last name is required'
+  if (!info.address?.trim()) errors.address = 'Address is required'
+  if (!info.city?.trim()) errors.city = 'City is required'
+  if (!info.state?.trim()) errors.state = 'State is required'
+  if (!info.zipCode?.trim()) errors.zipCode = 'ZIP code is required'
+  else if (!validateZipCode(info.zipCode, info.country)) errors.zipCode = 'Please enter a valid ZIP code'
+  if (!info.country?.trim()) errors.country = 'Country is required'
+
+  return { valid: Object.keys(errors).length === 0, errors }
+}
+
+export const validatePaymentInfo = (info: PaymentInfo): { valid: boolean; errors: Record<string, string> } => {
+  const errors: Record<string, string> = {}
+
+  if (!info.cardNumber?.trim()) errors.cardNumber = 'Card number is required'
+  else if (!validateCardNumber(info.cardNumber)) errors.cardNumber = 'Please enter a valid card number'
+  
+  if (!info.expiryDate?.trim()) errors.expiryDate = 'Expiry date is required'
+  else if (!validateExpiryDate(info.expiryDate)) {
+    const [month, year] = info.expiryDate.split('/')
+    const monthNum = parseInt(month)
+    const yearNum = parseInt(`20${year}`)
+    const now = new Date()
+    const expiry = new Date(yearNum, monthNum - 1)
+    
+    if (expiry < now) {
+      errors.expiryDate = 'Card has expired'
+    } else {
+      errors.expiryDate = 'Please enter a valid expiry date (MM/YY)'
+    }
+  }
+  
+  if (!info.cvv?.trim()) errors.cvv = 'CVV is required'
+  else if (!/^\d{3,4}$/.test(info.cvv)) errors.cvv = 'Please enter a valid CVV'
+  
+  if (!info.cardholderName?.trim()) errors.cardholderName = 'Cardholder name is required'
+
+  return { valid: Object.keys(errors).length === 0, errors }
+}
+
+export const calculateShipping = (subtotal: number, method: string): number => {
+  if (subtotal >= 500) return 0 // Free shipping over $500
+  
+  switch (method) {
+    case 'standard': return 9.99
+    case 'express': return 19.99
+    case 'overnight': return 29.99
+    default: return 9.99
+  }
+}
+
+export const calculateTax = (subtotal: number, state: string): number => {
+  const taxRates: Record<string, number> = {
+    'NY': 0.08,
+    'CA': 0.0725,
+    'TX': 0.0625,
+    'FL': 0.06,
+    'OR': 0, // No sales tax
+    'NH': 0, // No sales tax
+    'DE': 0, // No sales tax
+  }
+  
+  const rate = taxRates[state] || 0.05 // Default 5% for other states
+  return subtotal * rate
+}
+
+export const calculateOrderTotal = (orderData: {
+  subtotal: number
+  shipping: number
+  tax: number
+  discount: number
+}): number => {
+  return orderData.subtotal + orderData.shipping + orderData.tax - orderData.discount
+}
+
+export const formatOrderNumber = (orderId: number): string => {
+  const timestamp = Date.now().toString().slice(-8)
+  return `KW-${timestamp}-${orderId}`
+}
+
+export const validateCheckoutData = (data: {
+  shipping: ShippingInfo
+  billing: BillingInfo
+  payment: PaymentInfo
+  items: CartItem[]
+}): { valid: boolean; errors: Record<string, string> } => {
+  const errors: Record<string, string> = {}
+
+  // Validate shipping info
+  const shippingValidation = validateShippingInfo(data.shipping)
+  if (!shippingValidation.valid) {
+    Object.keys(shippingValidation.errors).forEach(key => {
+      errors[`shipping.${key}`] = shippingValidation.errors[key]
+    })
+  }
+
+  // Validate billing info
+  const billingValidation = validateBillingInfo(data.billing)
+  if (!billingValidation.valid) {
+    Object.keys(billingValidation.errors).forEach(key => {
+      errors[`billing.${key}`] = billingValidation.errors[key]
+    })
+  }
+
+  // Validate payment info
+  const paymentValidation = validatePaymentInfo(data.payment)
+  if (!paymentValidation.valid) {
+    Object.keys(paymentValidation.errors).forEach(key => {
+      errors[`payment.${key}`] = paymentValidation.errors[key]
+    })
+  }
+
+  // Validate cart items
+  if (!data.items || data.items.length === 0) {
+    errors.items = 'Cart cannot be empty'
+  }
+
+  return { valid: Object.keys(errors).length === 0, errors }
 }

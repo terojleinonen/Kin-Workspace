@@ -9,6 +9,12 @@ const customJestConfig = {
   testEnvironment: 'node',
   testMatch: ['**/__tests__/**/*.test.ts', '**/__tests__/**/*.test.tsx'],
   maxWorkers: 1, // Run tests sequentially to avoid database conflicts
+  moduleNameMapping: {
+    '^@/(.*)$': '<rootDir>/app/$1',
+  },
+  testEnvironmentOptions: {
+    customExportConditions: [''],
+  },
 }
 
 module.exports = createJestConfig(customJestConfig)

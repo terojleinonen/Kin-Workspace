@@ -1017,3 +1017,51 @@ export const productsDatabase: ProductWithVariants[] = [
     ]
   }
 ]
+
+// Convert ProductWithVariants to simple Product array for compatibility
+export const products: Product[] = productsDatabase.map(product => ({
+  id: product.id,
+  name: product.name,
+  price: product.basePrice,
+  image: product.image,
+  category: product.category,
+  slug: product.slug,
+  description: product.description,
+  features: product.tags,
+  inStock: product.inStock,
+  rating: product.rating
+}))
+
+// Helper functions for product operations
+export const getProductBySlug = (slug: string): Product | undefined => {
+  return products.find(product => product.slug === slug)
+}
+
+export const getProductsByCategory = (category: string): Product[] => {
+  return products.filter(product => product.category === category)
+}
+
+export const searchProducts = (query: string): Product[] => {
+  if (!query.trim()) {
+    return products
+  }
+  
+  const searchTerm = query.toLowerCase()
+  return products.filter(product => {
+    const searchableText = `${product.name} ${product.description || ''} ${product.category}`.toLowerCase()
+    return searchableText.includes(searchTerm)
+  })
+}
+
+export const getCategories = (): Array<{ name: string; count: number }> => {
+  const categoryMap = new Map<string, number>()
+  
+  products.forEach(product => {
+    const count = categoryMap.get(product.category) || 0
+    categoryMap.set(product.category, count + 1)
+  })
+  
+  return Array.from(categoryMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+}
