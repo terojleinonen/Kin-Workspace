@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "noEmit": true
+    },
+    "files": [],
+    "include": [],
+    "exclude": [
+        ".next",
+        "node_modules",
+        "kin-workspace/.next",
+        "cms/.next"
+    ],
+    "references": [
+        {
+            "path": "./kin-workspace"
+        },
+        {
+            "path": "./cms"
+        }
+    ]
+}
