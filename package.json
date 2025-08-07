@@ -1,51 +1,28 @@
 {
-  "name": "kin-workspace",
+  "name": "kin-workspace-monorepo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "type-check": "tsc --noEmit",
-    "test": "jest",
-    "test:watch": "jest --watch"
-  },
-  "dependencies": {
-    "@headlessui/react": "^2.2.0",
-    "@heroicons/react": "^2.2.0",
-    "@prisma/client": "^6.13.0",
-    "autoprefixer": "^10.4.20",
-    "bcryptjs": "^3.0.2",
-    "clsx": "^2.1.1",
-    "framer-motion": "^11.15.0",
-    "jsonwebtoken": "^9.0.2",
-    "next": "^15.1.0",
-    "postcss": "^8.5.1",
-    "prisma": "^6.13.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tailwindcss": "^3.4.15"
+    "dev": "concurrently \"npm run dev:ecommerce\" \"npm run dev:cms\"",
+    "dev:ecommerce": "cd kin-workspace && npm run dev",
+    "dev:cms": "cd cms && npm run dev",
+    "build": "npm run build:ecommerce && npm run build:cms",
+    "build:ecommerce": "cd kin-workspace && npm run build",
+    "build:cms": "cd cms && npm run build",
+    "start": "concurrently \"npm run start:ecommerce\" \"npm run start:cms\"",
+    "start:ecommerce": "cd kin-workspace && npm run start",
+    "start:cms": "cd cms && npm run start",
+    "install:all": "npm install && cd kin-workspace && npm install && cd ../cms && npm install",
+    "test": "cd kin-workspace && npm run test",
+    "lint": "cd kin-workspace && npm run lint && cd ../cms && npm run lint"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.4",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jest": "^30.0.0",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^22.10.2",
-    "@types/react": "^18.3.17",
-    "@types/react-dom": "^18.3.5",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^15.1.0",
-    "jest": "^30.0.5",
-    "jest-environment-jsdom": "^30.0.5",
-    "prettier": "^3.4.2",
-    "prettier-plugin-tailwindcss": "^0.6.9",
-    "ts-jest": "^29.4.1",
-    "typescript": "^5.7.2"
+    "concurrently": "^8.2.2"
   },
+  "workspaces": [
+    "kin-workspace",
+    "cms"
+  ],
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
