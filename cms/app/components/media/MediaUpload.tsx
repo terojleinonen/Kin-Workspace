@@ -187,8 +187,10 @@ export default function MediaUpload({ onClose, onSuccess }: MediaUploadProps) {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-gray-900">Upload Media Files</h3>
           <button
+            type="button"
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
+            aria-label="Close upload dialog"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
@@ -226,8 +228,10 @@ export default function MediaUpload({ onClose, onSuccess }: MediaUploadProps) {
             <p className="text-lg font-medium text-gray-900">
               Drop files here or{' '}
               <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="text-blue-600 hover:text-blue-500 underline"
+                aria-label="Browse files to upload"
               >
                 browse
               </button>
@@ -236,12 +240,17 @@ export default function MediaUpload({ onClose, onSuccess }: MediaUploadProps) {
               Supports images, documents, videos, and audio files up to 10MB
             </p>
           </div>
+          <label htmlFor="file-input" className="sr-only">
+            Select files to upload
+          </label>
           <input
+            id="file-input"
             ref={fileInputRef}
             type="file"
             multiple
             accept="image/*,application/pdf,.doc,.docx,.txt,.csv,video/*,audio/*"
             onChange={handleFileSelect}
+            aria-label="Select files to upload"
             className="hidden"
           />
         </div>
@@ -283,9 +292,11 @@ export default function MediaUpload({ onClose, onSuccess }: MediaUploadProps) {
                       <span className="text-red-600 text-sm">✗</span>
                     )}
                     <button
+                      type="button"
                       onClick={() => removeFile(uploadFile.id)}
                       className="text-gray-400 hover:text-gray-600"
                       disabled={isUploading}
+                      aria-label={`Remove ${uploadFile.file.name} from upload list`}
                     >
                       <XMarkIcon className="h-4 w-4" />
                     </button>
@@ -299,6 +310,7 @@ export default function MediaUpload({ onClose, onSuccess }: MediaUploadProps) {
         {/* Actions */}
         <div className="mt-6 flex justify-end space-x-3">
           <button
+            type="button"
             onClick={onClose}
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             disabled={isUploading}
@@ -306,6 +318,7 @@ export default function MediaUpload({ onClose, onSuccess }: MediaUploadProps) {
             Cancel
           </button>
           <button
+            type="button"
             onClick={uploadFiles}
             disabled={!hasValidFiles || isUploading}
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
