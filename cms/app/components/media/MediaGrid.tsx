@@ -193,6 +193,7 @@ export default function MediaGrid({
             {selectedFiles.size} file(s) selected
           </span>
           <button
+            type="button"
             onClick={handleBulkDelete}
             className="text-sm text-red-600 hover:text-red-800 font-medium"
           >
@@ -213,10 +214,15 @@ export default function MediaGrid({
           >
             {/* Selection Checkbox */}
             <div className="absolute top-2 left-2 z-10">
+              <label htmlFor={`select-media-${media.id}`} className="sr-only">
+                Select {media.originalName}
+              </label>
               <input
+                id={`select-media-${media.id}`}
                 type="checkbox"
                 checked={selectedFiles.has(media.id)}
                 onChange={() => toggleFileSelection(media.id)}
+                aria-label={`Select ${media.originalName}`}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
             </div>
@@ -225,22 +231,26 @@ export default function MediaGrid({
             <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
               <div className="flex space-x-1">
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation()
                     onSelectMedia(media)
                   }}
                   className="p-1 bg-white rounded shadow-sm hover:bg-gray-50"
                   title="View details"
+                  aria-label={`View details for ${media.originalName}`}
                 >
                   <EyeIcon className="h-4 w-4 text-gray-600" />
                 </button>
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation()
                     onDeleteMedia(media.id)
                   }}
                   className="p-1 bg-white rounded shadow-sm hover:bg-gray-50"
                   title="Delete"
+                  aria-label={`Delete ${media.originalName}`}
                 >
                   <TrashIcon className="h-4 w-4 text-red-600" />
                 </button>
@@ -284,9 +294,11 @@ export default function MediaGrid({
           
           <div className="flex items-center space-x-2">
             <button
+              type="button"
               onClick={() => onPageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
               className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Go to previous page"
             >
               <ChevronLeftIcon className="h-5 w-5" />
             </button>
@@ -299,6 +311,7 @@ export default function MediaGrid({
               return (
                 <button
                   key={pageNum}
+                  type="button"
                   onClick={() => onPageChange(pageNum)}
                   className={clsx(
                     'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
@@ -306,6 +319,8 @@ export default function MediaGrid({
                       ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
                       : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                   )}
+                  aria-label={`Go to page ${pageNum}`}
+                  aria-current={pageNum === pagination.page ? 'page' : undefined}
                 >
                   {pageNum}
                 </button>
@@ -313,9 +328,11 @@ export default function MediaGrid({
             })}
             
             <button
+              type="button"
               onClick={() => onPageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages}
               className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Go to next page"
             >
               <ChevronRightIcon className="h-5 w-5" />
             </button>
