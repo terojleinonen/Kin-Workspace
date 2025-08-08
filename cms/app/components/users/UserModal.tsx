@@ -9,10 +9,12 @@ import { useState, useEffect } from 'react'
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react'
 import { Fragment } from 'react'
 import { XMarkIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
-import { UserRole } from '@prisma/client'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+
+// Define UserRole type locally to avoid import issues
+type UserRole = 'ADMIN' | 'EDITOR' | 'VIEWER'
 
 interface User {
   id: string
@@ -160,8 +162,10 @@ export default function UserModal({ user, onClose, onSuccess }: UserModalProps) 
                     {title}
                   </DialogTitle>
                   <button
+                    type="button"
                     onClick={onClose}
                     className="text-gray-400 hover:text-gray-600"
+                    aria-label="Close modal"
                   >
                     <XMarkIcon className="h-6 w-6" />
                   </button>

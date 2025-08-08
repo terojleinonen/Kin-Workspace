@@ -6,7 +6,6 @@
 'use client'
 
 import { useState } from 'react'
-import { UserRole } from '@prisma/client'
 import {
   MagnifyingGlassIcon,
   PencilIcon,
@@ -18,6 +17,9 @@ import {
   ChevronDownIcon,
 } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
+
+// Define UserRole type locally to avoid import issues
+type UserRole = 'ADMIN' | 'EDITOR' | 'VIEWER'
 
 interface User {
   id: string
@@ -58,13 +60,13 @@ interface UserTableProps {
   onDeleteUser: (userId: string) => void
 }
 
-const roleColors = {
+const roleColors: Record<UserRole, string> = {
   ADMIN: 'bg-red-100 text-red-800',
   EDITOR: 'bg-yellow-100 text-yellow-800',
   VIEWER: 'bg-green-100 text-green-800',
 }
 
-const roleLabels = {
+const roleLabels: Record<UserRole, string> = {
   ADMIN: 'Admin',
   EDITOR: 'Editor',
   VIEWER: 'Viewer',
@@ -88,9 +90,9 @@ export default function UserTable({
   }
 
   const handleSort = (column: string) => {
-    const newSortOrder = 
+    const newSortOrder =
       filters.sortBy === column && filters.sortOrder === 'asc' ? 'desc' : 'asc'
-    
+
     onFilterChange({
       sortBy: column,
       sortOrder: newSortOrder,
@@ -101,8 +103,8 @@ export default function UserTable({
     if (filters.sortBy !== column) {
       return <ChevronUpDownIcon className="h-4 w-4" />
     }
-    
-    return filters.sortOrder === 'asc' 
+
+    return filters.sortOrder === 'asc'
       ? <ChevronUpIcon className="h-4 w-4" />
       : <ChevronDownIcon className="h-4 w-4" />
   }
@@ -139,6 +141,7 @@ export default function UserTable({
             value={filters.role}
             onChange={(e) => onFilterChange({ role: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Filter users by role"
           >
             <option value="">All Roles</option>
             <option value="ADMIN">Admin</option>
@@ -260,15 +263,19 @@ export default function UserTable({
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
                       <button
+                        type="button"
                         onClick={() => onEditUser(user)}
                         className="text-blue-600 hover:text-blue-900 p-1"
+                        aria-label="Edit user"
                         title="Edit user"
                       >
                         <PencilIcon className="h-4 w-4" />
                       </button>
                       <button
+                        type="button"
                         onClick={() => onDeleteUser(user.id)}
                         className="text-red-600 hover:text-red-900 p-1"
+                        aria-label="Delete user"
                         title="Delete user"
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -287,6 +294,7 @@ export default function UserTable({
         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
+              type="button"
               onClick={() => onPageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
               className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -294,6 +302,7 @@ export default function UserTable({
               Previous
             </button>
             <button
+              type="button"
               onClick={() => onPageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages}
               className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -318,23 +327,25 @@ export default function UserTable({
             <div>
               <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                 <button
+                  type="button"
                   onClick={() => onPageChange(pagination.page - 1)}
                   disabled={pagination.page <= 1}
                   className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Previous page"
                 >
                   <ChevronLeftIcon className="h-5 w-5" />
                 </button>
-                
+
                 {/* Page numbers */}
                 {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
                   .filter(page => {
                     const current = pagination.page
-                    return page === 1 || page === pagination.totalPages || 
-                           (page >= current - 1 && page <= current + 1)
+                    return page === 1 || page === pagination.totalPages ||
+                      (page >= current - 1 && page <= current + 1)
                   })
                   .map((page, index, array) => {
                     const showEllipsis = index > 0 && array[index - 1] !== page - 1
-                    
+
                     return (
                       <div key={page}>
                         {showEllipsis && (
@@ -343,6 +354,7 @@ export default function UserTable({
                           </span>
                         )}
                         <button
+                          type="button"
                           onClick={() => onPageChange(page)}
                           className={clsx(
                             'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
@@ -350,17 +362,21 @@ export default function UserTable({
                               ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
                               : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                           )}
+                          aria-label={`Go to page ${page}`}
+                          aria-current={page === pagination.page ? 'page' : undefined}
                         >
                           {page}
                         </button>
                       </div>
                     )
                   })}
-                
+
                 <button
+                  type="button"
                   onClick={() => onPageChange(pagination.page + 1)}
                   disabled={pagination.page >= pagination.totalPages}
                   className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Next page"
                 >
                   <ChevronRightIcon className="h-5 w-5" />
                 </button>
