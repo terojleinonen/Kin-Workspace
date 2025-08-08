@@ -173,12 +173,14 @@ export default function MediaModal({
           <h3 className="text-lg font-medium text-gray-900">Media Details</h3>
           <div className="flex items-center space-x-2">
             <button
+              type="button"
               onClick={() => setIsEditing(!isEditing)}
               className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
             >
               {isEditing ? 'Cancel' : 'Edit'}
             </button>
             <button
+              type="button"
               onClick={handleDelete}
               className="px-3 py-1 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50"
             >
@@ -186,8 +188,10 @@ export default function MediaModal({
               Delete
             </button>
             <button
+              type="button"
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
+              aria-label="Close modal"
             >
               <XMarkIcon className="h-6 w-6" />
             </button>
@@ -257,16 +261,23 @@ export default function MediaModal({
             <div>
               <h4 className="text-sm font-medium text-gray-900 mb-3">File URL</h4>
               <div className="flex items-center space-x-2">
+                <label htmlFor="media-url" className="sr-only">
+                  Media file URL
+                </label>
                 <input
+                  id="media-url"
                   type="text"
                   value={getFullUrl(media.url)}
                   readOnly
+                  aria-label="Media file URL"
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm"
                 />
                 <button
+                  type="button"
                   onClick={() => copyToClipboard(getFullUrl(media.url))}
                   className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                   title="Copy URL"
+                  aria-label="Copy URL to clipboard"
                 >
                   <ClipboardDocumentIcon className="h-4 w-4" />
                 </button>
@@ -342,6 +353,7 @@ export default function MediaModal({
               {isEditing && (
                 <div className="mt-4 flex justify-end space-x-3">
                   <button
+                    type="button"
                     onClick={() => setIsEditing(false)}
                     className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                     disabled={isSaving}
@@ -349,6 +361,7 @@ export default function MediaModal({
                     Cancel
                   </button>
                   <button
+                    type="button"
                     onClick={handleSave}
                     disabled={isSaving}
                     className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
