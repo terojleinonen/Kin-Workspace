@@ -67,15 +67,20 @@ export default function MediaFilters({
       {/* Search and Basic Filters */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex-1 max-w-lg">
+          <label htmlFor="media-search" className="sr-only">
+            Search media files
+          </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
             </div>
             <input
+              id="media-search"
               type="text"
               placeholder="Search media files..."
               value={filters.search}
               onChange={(e) => handleSearchChange(e.target.value)}
+              aria-label="Search media files"
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -83,39 +88,56 @@ export default function MediaFilters({
 
         <div className="flex items-center space-x-4">
           {/* File Type Filter */}
-          <select
-            value={filters.type}
-            onChange={(e) => handleTypeChange(e.target.value as MediaType | '')}
-            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md"
-          >
-            <option value="">All Types</option>
-            <option value="image">Images</option>
-            <option value="document">Documents</option>
-            <option value="video">Videos</option>
-            <option value="audio">Audio</option>
-          </select>
+          <div>
+            <label htmlFor="media-type-filter" className="sr-only">
+              Filter by file type
+            </label>
+            <select
+              id="media-type-filter"
+              value={filters.type}
+              onChange={(e) => handleTypeChange(e.target.value as MediaType | '')}
+              aria-label="Filter by file type"
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md"
+            >
+              <option value="">All Types</option>
+              <option value="image">Images</option>
+              <option value="document">Documents</option>
+              <option value="video">Videos</option>
+              <option value="audio">Audio</option>
+            </select>
+          </div>
 
           {/* Sort Options */}
-          <select
-            value={`${filters.sortBy}-${filters.sortOrder}`}
-            onChange={(e) => {
-              const [sortBy, sortOrder] = e.target.value.split('-')
-              handleSortChange(sortBy, sortOrder)
-            }}
-            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md"
-          >
-            <option value="createdAt-desc">Newest First</option>
-            <option value="createdAt-asc">Oldest First</option>
-            <option value="name-asc">Name A-Z</option>
-            <option value="name-desc">Name Z-A</option>
-            <option value="size-desc">Largest First</option>
-            <option value="size-asc">Smallest First</option>
-            <option value="type-asc">Type A-Z</option>
-          </select>
+          <div>
+            <label htmlFor="media-sort-filter" className="sr-only">
+              Sort media files
+            </label>
+            <select
+              id="media-sort-filter"
+              value={`${filters.sortBy}-${filters.sortOrder}`}
+              onChange={(e) => {
+                const [sortBy, sortOrder] = e.target.value.split('-')
+                handleSortChange(sortBy, sortOrder)
+              }}
+              aria-label="Sort media files"
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md"
+            >
+              <option value="createdAt-desc">Newest First</option>
+              <option value="createdAt-asc">Oldest First</option>
+              <option value="name-asc">Name A-Z</option>
+              <option value="name-desc">Name Z-A</option>
+              <option value="size-desc">Largest First</option>
+              <option value="size-asc">Smallest First</option>
+              <option value="type-asc">Type A-Z</option>
+            </select>
+          </div>
 
           {/* Advanced Filters Toggle */}
           <button
+            type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
+            aria-expanded={showAdvanced}
+            aria-controls="advanced-filters"
             className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <FunnelIcon className="h-4 w-4 mr-2" />
@@ -126,7 +148,7 @@ export default function MediaFilters({
 
       {/* Advanced Filters */}
       {showAdvanced && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div id="advanced-filters" className="mt-4 pt-4 border-t border-gray-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Folder Filter */}
             <div>
@@ -145,10 +167,14 @@ export default function MediaFilters({
 
             {/* File Size Range - Could be added later */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="file-size-filter" className="block text-sm font-medium text-gray-700 mb-1">
                 File Size
               </label>
-              <select className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <select 
+                id="file-size-filter"
+                aria-label="Filter by file size"
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
                 <option value="">Any Size</option>
                 <option value="small">Small (&lt; 1MB)</option>
                 <option value="medium">Medium (1-10MB)</option>
@@ -158,10 +184,14 @@ export default function MediaFilters({
 
             {/* Date Range - Could be added later */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="upload-date-filter" className="block text-sm font-medium text-gray-700 mb-1">
                 Upload Date
               </label>
-              <select className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <select 
+                id="upload-date-filter"
+                aria-label="Filter by upload date"
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
                 <option value="">Any Date</option>
                 <option value="today">Today</option>
                 <option value="week">This Week</option>
@@ -186,6 +216,7 @@ export default function MediaFilters({
 
         {hasActiveFilters && (
           <button
+            type="button"
             onClick={clearFilters}
             className="text-sm text-gray-500 hover:text-gray-700 underline"
           >
