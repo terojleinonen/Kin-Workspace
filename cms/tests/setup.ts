@@ -13,6 +13,14 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }))
 
+// Mock Next.js Request/Response for API testing
+global.Request = global.Request || class MockRequest {}
+global.Response = global.Response || class MockResponse {}
+global.Headers = global.Headers || class MockHeaders {}
+
+// Mock fetch for API tests
+global.fetch = jest.fn()
+
 // Extend Jest matchers
 declare global {
   namespace jest {
