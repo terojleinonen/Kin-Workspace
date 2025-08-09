@@ -123,6 +123,8 @@ export default function MediaMetadataEditor({
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full"
+            aria-label="Close metadata editor"
+            title="Close metadata editor"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
@@ -156,14 +158,16 @@ export default function MediaMetadataEditor({
                 <h3 className="text-lg font-medium mb-3">File Information</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="file-name-input" className="block text-sm font-medium text-gray-700 mb-1">
                       File Name
                     </label>
                     <input
                       type="text"
+                      id="file-name-input"
                       value={metadata.name}
                       onChange={(e) => setMetadata(prev => ({ ...prev, name: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      aria-label="File name"
                     />
                   </div>
                   
@@ -227,6 +231,8 @@ export default function MediaMetadataEditor({
                       <button
                         onClick={() => removeTag(tag)}
                         className="ml-1 text-blue-600 hover:text-blue-800"
+                        aria-label={`Remove tag ${tag}`}
+                        title={`Remove tag ${tag}`}
                       >
                         <XMarkIcon className="w-3 h-3" />
                       </button>
@@ -266,6 +272,8 @@ export default function MediaMetadataEditor({
                       <button
                         onClick={() => removeCustomField(key)}
                         className="text-red-600 hover:text-red-800"
+                        aria-label={`Remove custom field ${key}`}
+                        title={`Remove custom field ${key}`}
                       >
                         <XMarkIcon className="w-4 h-4" />
                       </button>
