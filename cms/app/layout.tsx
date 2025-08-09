@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Link from 'next/link'
 import SessionProvider from './components/auth/SessionProvider'
 
 export const metadata: Metadata = {
@@ -24,12 +25,12 @@ export default function RootLayout({
                     Kin Workspace CMS
                   </h1>
                   <nav className="flex space-x-4">
-                    <a href="/" className="text-gray-600 hover:text-gray-900">
+                    <Link href="/" className="text-gray-600 hover:text-gray-900">
                       Dashboard
-                    </a>
-                    <a href="/products" className="text-gray-600 hover:text-gray-900">
+                    </Link>
+                    <Link href="/products" className="text-gray-600 hover:text-gray-900">
                       Products
-                    </a>
+                    </Link>
                     <a href="/orders" className="text-gray-600 hover:text-gray-900">
                       Orders
                     </a>

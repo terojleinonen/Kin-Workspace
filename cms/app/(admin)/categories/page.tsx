@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import CategoryTree from '@/components/categories/CategoryTree'
 import CategoryForm from '@/components/categories/CategoryForm'
@@ -20,7 +20,7 @@ export default function CategoriesPage() {
   const [selectedParent, setSelectedParent] = useState<Category | null>(null)
 
   // Fetch categories
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams()
@@ -36,11 +36,11 @@ export default function CategoriesPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery])
 
   useEffect(() => {
     fetchCategories()
-  }, [searchQuery])
+  }, [fetchCategories])
 
   const handleCreateCategory = (parent?: Category) => {
     setSelectedParent(parent || null)

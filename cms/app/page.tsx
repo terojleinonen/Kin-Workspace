@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function Dashboard() {
   return (
     <div className="space-y-6">
@@ -15,12 +17,12 @@ export default function Dashboard() {
             <p className="text-blue-700 text-sm mb-3">
               Manage your product catalog, inventory, and pricing.
             </p>
-            <a 
+            <Link 
               href="/products" 
               className="inline-block bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
             >
               Manage Products
-            </a>
+            </Link>
           </div>
           
           <div className="bg-green-50 rounded-lg p-4">
