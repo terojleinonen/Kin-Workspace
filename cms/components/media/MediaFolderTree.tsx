@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronRightIcon, ChevronDownIcon, FolderIcon, FolderOpenIcon } from '@heroicons/react/24/outline';
-import { getDynamicPaddingLeft } from '../../utils/dynamic-styles';
+import { getTreeIndentClass } from '../../utils/dynamic-styles';
 
 export interface MediaFolder {
   id: string;
@@ -65,10 +65,9 @@ function FolderNode({
   return (
     <div>
       <div
-        className={`flex items-center py-1 px-2 rounded cursor-pointer hover:bg-gray-100 dynamic-padding-left ${
+        className={`flex items-center py-1 px-2 rounded cursor-pointer hover:bg-gray-100 ${getTreeIndentClass(level)} ${
           isSelected ? 'bg-blue-50 text-blue-700' : ''
         }`}
-        style={getDynamicPaddingLeft(level, 8, 16)} // Dynamic indentation based on tree level
         onClick={onSelect}
       >
         <button

@@ -12,7 +12,7 @@ import { PhotoIcon } from '@heroicons/react/24/outline'
 import { getEditorHeightClass } from '../../../utils/dynamic-styles'
 
 // Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { 
+const ReactQuill = dynamic(() => import('react-quill'), {
   ssr: false,
   loading: () => <div className="h-32 bg-gray-100 animate-pulse rounded-md" />
 })
@@ -76,8 +76,8 @@ export default function RichTextEditor({
       container: [
         [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
         ['bold', 'italic', 'underline', 'strike'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'indent': '-1'}, { 'indent': '+1' }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'indent': '-1' }, { 'indent': '+1' }],
         ['blockquote', 'code-block'],
         [{ 'align': [] }],
         ['link'],
@@ -106,7 +106,7 @@ export default function RichTextEditor({
 
   if (!isClient) {
     return (
-      <div 
+      <div
         className={`border border-gray-300 rounded-md bg-gray-100 animate-pulse ${getEditorHeightClass(height)}`}
       />
     )
@@ -159,7 +159,7 @@ export function getPlainText(html: string): string {
 export function truncateHtml(html: string, maxLength: number): string {
   const plainText = getPlainText(html)
   if (plainText.length <= maxLength) return html
-  
+
   const truncated = plainText.substring(0, maxLength) + '...'
   return `<p>${truncated}</p>`
 }
@@ -170,25 +170,25 @@ export function validateHtmlContent(html: string): {
   errors: string[]
 } {
   const errors: string[] = []
-  
+
   // Check for empty content
   if (!html || getPlainText(html).length === 0) {
     errors.push('Content cannot be empty')
   }
-  
+
   // Check for potentially dangerous content
   const dangerousPatterns = [
     /<script/i,
     /javascript:/i,
     /on\w+\s*=/i, // Event handlers like onclick, onload, etc.
   ]
-  
+
   dangerousPatterns.forEach(pattern => {
     if (pattern.test(html)) {
       errors.push('Content contains potentially dangerous elements')
     }
   })
-  
+
   return {
     isValid: errors.length === 0,
     errors
