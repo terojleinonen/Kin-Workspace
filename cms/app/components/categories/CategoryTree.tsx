@@ -64,7 +64,7 @@ function CategoryNode({
         className={`group flex items-center py-2 px-3 rounded-md hover:bg-gray-50 ${
           isDragOver ? 'bg-blue-50 border-2 border-blue-300' : ''
         }`}
-        style={{ paddingLeft: `${paddingLeft + 12}px` }}
+        style={{ paddingLeft: `${paddingLeft + 12}px` }} // Dynamic padding based on hierarchy level
         draggable
         onDragStart={() => onDragStart(category)}
         onDragOver={(e) => onDragOver(e, category)}
