@@ -27,6 +27,7 @@ const config = {
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/app/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
   testTimeout: 30000, // 30 seconds for database operations
 }

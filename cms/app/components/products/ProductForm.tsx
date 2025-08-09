@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Product, ProductFormData } from '@/lib/types'
 import CategorySelector from '@/components/categories/CategorySelector'
+import RichTextEditorWithMedia from '@/components/editor/RichTextEditorWithMedia'
 
 interface ProductFormProps {
   product?: Product | null
@@ -173,16 +174,15 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
           </div>
 
           <div className="sm:col-span-2">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
               Full Description
             </label>
-            <textarea
-              id="description"
-              rows={4}
+            <RichTextEditorWithMedia
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Detailed product description"
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+              placeholder="Detailed product description with rich formatting..."
+              height="200px"
+              allowedMediaTypes={['image']}
             />
           </div>
         </div>
