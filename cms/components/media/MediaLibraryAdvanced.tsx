@@ -283,6 +283,8 @@ export default function MediaLibraryAdvanced({
                   setSortOrder(newSortOrder);
                 }}
                 className="px-3 py-2 border border-gray-300 rounded-lg"
+                aria-label="Sort files by"
+                title="Sort files by"
               >
                 <option value="date-desc">Newest First</option>
                 <option value="date-asc">Oldest First</option>
@@ -296,12 +298,16 @@ export default function MediaLibraryAdvanced({
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 ${viewMode === 'grid' ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}
+                  aria-label="Grid view"
+                  title="Grid view"
                 >
                   <Squares2X2Icon className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
                   className={`p-2 ${viewMode === 'list' ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}
+                  aria-label="List view"
+                  title="List view"
                 >
                   <ListBulletIcon className="w-4 h-4" />
                 </button>
@@ -314,13 +320,15 @@ export default function MediaLibraryAdvanced({
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="file-type-filter" className="block text-sm font-medium text-gray-700 mb-1">
                     File Type
                   </label>
                   <select
                     value={filters.type}
                     onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    aria-label="Filter by file type"
+                    id="file-type-filter"
                   >
                     <option value="">All Types</option>
                     <option value="image">Images</option>
@@ -331,32 +339,36 @@ export default function MediaLibraryAdvanced({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="date-from-filter" className="block text-sm font-medium text-gray-700 mb-1">
                     Date From
                   </label>
                   <input
                     type="date"
+                    id="date-from-filter"
                     value={filters.dateRange.start}
                     onChange={(e) => setFilters(prev => ({ 
                       ...prev, 
                       dateRange: { ...prev.dateRange, start: e.target.value }
                     }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    aria-label="Filter files from date"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="date-to-filter" className="block text-sm font-medium text-gray-700 mb-1">
                     Date To
                   </label>
                   <input
                     type="date"
+                    id="date-to-filter"
                     value={filters.dateRange.end}
                     onChange={(e) => setFilters(prev => ({ 
                       ...prev, 
                       dateRange: { ...prev.dateRange, end: e.target.value }
                     }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    aria-label="Filter files to date"
                   />
                 </div>
               </div>
