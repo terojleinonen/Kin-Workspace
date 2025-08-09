@@ -23,6 +23,16 @@ export function getCategoryIndentClass(level: number): string {
 }
 
 /**
+ * Get category tree indentation class based on level (24px increment)
+ * @param level - The tree level (0-based)
+ * @returns CSS class name for indentation
+ */
+export function getCategoryTreeIndentClass(level: number): string {
+  const clampedLevel = Math.min(Math.max(level, 0), 10);
+  return `category-tree-indent-${clampedLevel}`;
+}
+
+/**
  * Get editor height class based on height value
  * @param height - Height in pixels or string
  * @returns CSS class name for height

@@ -26,6 +26,19 @@
 .category-indent-9 { padding-left: 192px; }
 .category-indent-10 { padding-left: 212px; }
 
+/* Category tree indentation utilities (24px increment + 12px base) */
+.category-tree-indent-0 { padding-left: 12px; }
+.category-tree-indent-1 { padding-left: 36px; }
+.category-tree-indent-2 { padding-left: 60px; }
+.category-tree-indent-3 { padding-left: 84px; }
+.category-tree-indent-4 { padding-left: 108px; }
+.category-tree-indent-5 { padding-left: 132px; }
+.category-tree-indent-6 { padding-left: 156px; }
+.category-tree-indent-7 { padding-left: 180px; }
+.category-tree-indent-8 { padding-left: 204px; }
+.category-tree-indent-9 { padding-left: 228px; }
+.category-tree-indent-10 { padding-left: 252px; }
+
 /* Dynamic height utilities for editors */
 .editor-height-sm { height: 200px; }
 .editor-height-md { height: 300px; }
