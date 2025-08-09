@@ -124,6 +124,8 @@ export default function CategorySelector({
                 type="button"
                 onClick={() => handleRemoveCategory(category.id)}
                 className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200"
+                aria-label={`Remove ${category.name} category`}
+                title={`Remove ${category.name} category`}
               >
                 <XMarkIcon className="w-3 h-3" />
               </button>
@@ -193,6 +195,7 @@ export default function CategorySelector({
                       onChange={() => {}}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-3"
                       disabled={isDisabled}
+                      aria-label={`Select ${category.name} category`}
                     />
                     <div className="flex-1 min-w-0">
                       <span className={`block truncate ${isSelected ? 'font-medium' : 'font-normal'}`}>
