@@ -67,7 +67,7 @@ function FolderNode({
         className={`flex items-center py-1 px-2 rounded cursor-pointer hover:bg-gray-100 ${
           isSelected ? 'bg-blue-50 text-blue-700' : ''
         }`}
-        style={{ paddingLeft: `${level * 16 + 8}px` }}
+        style={{ paddingLeft: `${level * 16 + 8}px` }} // Dynamic indentation based on tree level
         onClick={onSelect}
       >
         <button
@@ -103,6 +103,8 @@ function FolderNode({
             onBlur={handleRename}
             onKeyDown={handleKeyDown}
             className="flex-1 px-1 py-0.5 text-sm border rounded"
+            aria-label={`Rename folder ${folder.name}`}
+            title={`Rename folder ${folder.name}`}
             autoFocus
           />
         ) : (
