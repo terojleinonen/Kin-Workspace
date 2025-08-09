@@ -1,0 +1,42 @@
+/* Dynamic utility classes for components that need runtime-calculated styles */
+
+/* Tree indentation utilities - supports up to 10 levels */
+.tree-indent-0 { padding-left: 8px; }
+.tree-indent-1 { padding-left: 24px; }
+.tree-indent-2 { padding-left: 40px; }
+.tree-indent-3 { padding-left: 56px; }
+.tree-indent-4 { padding-left: 72px; }
+.tree-indent-5 { padding-left: 88px; }
+.tree-indent-6 { padding-left: 104px; }
+.tree-indent-7 { padding-left: 120px; }
+.tree-indent-8 { padding-left: 136px; }
+.tree-indent-9 { padding-left: 152px; }
+.tree-indent-10 { padding-left: 168px; }
+
+/* Category selector indentation utilities */
+.category-indent-0 { padding-left: 12px; }
+.category-indent-1 { padding-left: 32px; }
+.category-indent-2 { padding-left: 52px; }
+.category-indent-3 { padding-left: 72px; }
+.category-indent-4 { padding-left: 92px; }
+.category-indent-5 { padding-left: 112px; }
+.category-indent-6 { padding-left: 132px; }
+.category-indent-7 { padding-left: 152px; }
+.category-indent-8 { padding-left: 172px; }
+.category-indent-9 { padding-left: 192px; }
+.category-indent-10 { padding-left: 212px; }
+
+/* Dynamic height utilities for editors */
+.editor-height-sm { height: 200px; }
+.editor-height-md { height: 300px; }
+.editor-height-lg { height: 400px; }
+.editor-height-xl { height: 500px; }
+
+/* CSS custom properties for truly dynamic values when needed */
+.dynamic-padding-left {
+  padding-left: var(--dynamic-padding, 8px);
+}
+
+.dynamic-height {
+  height: var(--dynamic-height, 300px);
+}

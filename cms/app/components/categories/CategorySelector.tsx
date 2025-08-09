@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Category } from '@/lib/types'
+import { getCategoryIndentClass } from '../../../utils/dynamic-styles'
 
 interface CategorySelectorProps {
   selectedCategories: string[]
@@ -182,11 +183,10 @@ export default function CategorySelector({
               return (
                 <div
                   key={category.id}
-                  className={`cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 ${
+                  className={`${getCategoryIndentClass(category.level)} cursor-pointer select-none relative py-2 pr-9 hover:bg-gray-100 ${
                     isDisabled ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                   onClick={() => !isDisabled && handleToggleCategory(category.id)}
-                  style={{ paddingLeft: `${12 + category.level * 20}px` }}
                 >
                   <div className="flex items-center">
                     <input

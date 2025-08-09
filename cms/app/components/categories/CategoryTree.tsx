@@ -15,6 +15,7 @@ import {
   Bars3Icon,
 } from '@heroicons/react/24/outline'
 import { Category } from '@/lib/types'
+import { getDynamicPaddingLeft } from '../../../utils/dynamic-styles'
 
 interface CategoryTreeProps {
   categories: Category[]
@@ -61,10 +62,10 @@ function CategoryNode({
   return (
     <div>
       <div
-        className={`group flex items-center py-2 px-3 rounded-md hover:bg-gray-50 ${
+        className={`group flex items-center py-2 px-3 rounded-md hover:bg-gray-50 dynamic-padding-left ${
           isDragOver ? 'bg-blue-50 border-2 border-blue-300' : ''
         }`}
-        style={{ paddingLeft: `${paddingLeft + 12}px` }} // Dynamic padding based on hierarchy level
+        style={getDynamicPaddingLeft(Math.floor(paddingLeft / 16), 12, 16)} // Dynamic padding based on hierarchy level
         draggable
         onDragStart={() => onDragStart(category)}
         onDragOver={(e) => onDragOver(e, category)}
