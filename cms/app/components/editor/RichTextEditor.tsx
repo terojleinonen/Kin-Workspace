@@ -132,7 +132,6 @@ export default function RichTextEditor({
       {/* Quill Editor */}
       <div style={{ height }}>
         <ReactQuill
-          ref={quillRef}
           theme="snow"
           value={value}
           onChange={handleChange}

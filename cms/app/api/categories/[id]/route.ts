@@ -149,9 +149,11 @@ export async function PUT(
         }
         
         if (currentParent.parentId) {
-          currentParent = await prisma.category.findUnique({
+          const nextParent = await prisma.category.findUnique({
             where: { id: currentParent.parentId },
           })
+          if (!nextParent) break
+          currentParent = nextParent
         } else {
           break
         }
@@ -179,7 +181,7 @@ export async function PUT(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: error.issues },
         { status: 400 }
       )
     }

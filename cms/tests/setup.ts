@@ -72,7 +72,10 @@ expect.extend({
 jest.setTimeout(30000)
 
 // Mock environment variables for tests
-process.env.NODE_ENV = 'test'
+// Set test environment
+if (!process.env.NODE_ENV) {
+  (process.env as any).NODE_ENV = 'test'
+}
 process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://cms_user:secure_password@localhost:5432/kin_workspace_cms_test'
 
 // Global test database instance

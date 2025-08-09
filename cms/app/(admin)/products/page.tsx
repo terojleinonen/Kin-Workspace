@@ -169,7 +169,7 @@ export default function ProductsPage() {
           <div className="flex items-center space-x-4">
             <select
               value={filters.status || ''}
-              onChange={(e) => handleFilterChange({ status: e.target.value || undefined })}
+              onChange={(e) => handleFilterChange({ status: (e.target.value as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') || undefined })}
               aria-label="Filter by status"
               className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md"
             >

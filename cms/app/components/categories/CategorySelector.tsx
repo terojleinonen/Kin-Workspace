@@ -194,7 +194,7 @@ export default function CategorySelector({
                       checked={isSelected}
                       onChange={() => {}}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-3"
-                      disabled={isDisabled}
+                      disabled={!!isDisabled}
                       aria-label={`Select ${category.name} category`}
                     />
                     <div className="flex-1 min-w-0">

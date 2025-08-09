@@ -242,7 +242,7 @@ export default function CategoryTree({
     // Create reorder update
     const updates = [{
       categoryId: draggedCategory.id,
-      newParentId: targetCategory.parentId,
+      newParentId: targetCategory.parentId || null,
       newSortOrder,
     }]
 

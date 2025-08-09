@@ -205,7 +205,7 @@ describe('CategorySelector', () => {
 
     await waitFor(() => {
       const checkboxes = screen.getAllByRole('checkbox')
-      const secondCheckbox = checkboxes.find(cb => !cb.checked)
+      const secondCheckbox = checkboxes.find(cb => !(cb as HTMLInputElement).checked)
       expect(secondCheckbox).toBeDisabled()
     })
   })

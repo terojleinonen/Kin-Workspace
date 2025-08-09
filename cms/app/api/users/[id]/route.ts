@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authConfig } from '@/lib/auth-config'
+import { authOptions } from '@/lib/auth-config'
 import { prisma } from '@/lib/db'
 import { hashPassword } from '@/lib/password-utils'
 import { UserRole } from '@prisma/client'
@@ -21,7 +21,7 @@ const updateUserSchema = z.object({
 
 // Check if user has admin permissions or is updating their own profile
 async function requireUserAccess(userId: string, requireAdmin = false) {
-  const session = await getServerSession(authConfig)
+  const session = await getServerSession(authOptions)
   
   if (!session?.user) {
     return NextResponse.json(
@@ -179,7 +179,7 @@ export async function PUT(
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: { code: 'VALIDATION_ERROR', message: 'Invalid user data', details: error.errors } },
+        { error: { code: 'VALIDATION_ERROR', message: 'Invalid user data', details: error.issues } },
         { status: 400 }
       )
     }

@@ -77,7 +77,7 @@ export default function MediaUpload({ onClose, onSuccess }: MediaUploadProps) {
         id: generateId(),
         progress: 0,
         status: error ? 'error' : 'pending',
-        error,
+        error: error || undefined,
       })
     })
 

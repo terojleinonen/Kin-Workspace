@@ -40,9 +40,10 @@ export const UPLOAD_CONFIG = {
 export const fileValidationSchema = z.object({
   name: z.string().min(1, 'Filename is required'),
   size: z.number().max(MAX_FILE_SIZE, `File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`),
-  type: z.enum(SUPPORTED_MIME_TYPES, {
-    errorMap: () => ({ message: `Unsupported file type. Supported formats: ${SUPPORTED_IMAGE_FORMATS.join(', ')}` })
-  }),
+  type: z.string().refine(
+    (value) => SUPPORTED_MIME_TYPES.includes(value as any),
+    { message: `Unsupported file type. Supported formats: ${SUPPORTED_IMAGE_FORMATS.join(', ')}` }
+  ),
 })
 
 export type FileValidation = z.infer<typeof fileValidationSchema>
