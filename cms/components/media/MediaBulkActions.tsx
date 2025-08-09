@@ -118,6 +118,8 @@ export default function MediaBulkActions({
           <button
             onClick={onClearSelection}
             className="p-1 text-gray-400 hover:text-gray-600"
+            aria-label="Clear selection"
+            title="Clear selection"
           >
             <XMarkIcon className="w-4 h-4" />
           </button>
