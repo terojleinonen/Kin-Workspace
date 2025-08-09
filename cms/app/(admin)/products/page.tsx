@@ -170,6 +170,7 @@ export default function ProductsPage() {
             <select
               value={filters.status || ''}
               onChange={(e) => handleFilterChange({ status: e.target.value || undefined })}
+              aria-label="Filter by status"
               className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md"
             >
               <option value="">All Status</option>
@@ -193,10 +194,11 @@ export default function ProductsPage() {
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="featured-filter" className="block text-sm font-medium text-gray-700 mb-1">
                   Featured
                 </label>
                 <select
+                  id="featured-filter"
                   value={filters.featured?.toString() || ''}
                   onChange={(e) => handleFilterChange({ 
                     featured: e.target.value ? e.target.value === 'true' : undefined 
