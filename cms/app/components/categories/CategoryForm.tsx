@@ -113,6 +113,8 @@ export default function CategoryForm({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
+            aria-label="Close dialog"
+            title="Close dialog"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
