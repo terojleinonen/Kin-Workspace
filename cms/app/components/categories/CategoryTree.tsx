@@ -62,9 +62,8 @@ function CategoryNode({
   return (
     <div>
       <div
-        className={`group flex items-center py-2 px-3 rounded-md hover:bg-gray-50 ${getCategoryTreeIndentClass(level)} ${
-          isDragOver ? 'bg-blue-50 border-2 border-blue-300' : ''
-        }`}
+        className={`group flex items-center py-2 px-3 rounded-md hover:bg-gray-50 ${getCategoryTreeIndentClass(level)} ${isDragOver ? 'bg-blue-50 border-2 border-blue-300' : ''
+          }`}
         draggable
         onDragStart={() => onDragStart(category)}
         onDragOver={(e) => onDragOver(e, category)}
@@ -142,11 +141,10 @@ function CategoryNode({
             title="Delete category"
             disabled={hasChildren || (category._count?.products || 0) > 0}
           >
-            <TrashIcon className={`h-4 w-4 ${
-              hasChildren || (category._count?.products || 0) > 0
-                ? 'text-gray-300'
-                : 'text-red-600'
-            }`} />
+            <TrashIcon className={`h-4 w-4 ${hasChildren || (category._count?.products || 0) > 0
+              ? 'text-gray-300'
+              : 'text-red-600'
+              }`} />
           </button>
         </div>
       </div>
@@ -220,7 +218,7 @@ export default function CategoryTree({
     // Prevent dropping a parent onto its own child
     const isDescendant = (parent: Category, potentialChild: Category): boolean => {
       if (!parent.children) return false
-      return parent.children.some(child => 
+      return parent.children.some(child =>
         child.id === potentialChild.id || isDescendant(child, potentialChild)
       )
     }
@@ -232,7 +230,7 @@ export default function CategoryTree({
     }
 
     // Calculate new sort order (insert after target)
-    const siblings = targetCategory.parentId 
+    const siblings = targetCategory.parentId
       ? categories.find(c => c.id === targetCategory.parentId)?.children || []
       : categories.filter(c => !c.parentId)
 
@@ -251,7 +249,7 @@ export default function CategoryTree({
       if (index >= newSortOrder && sibling.id !== draggedCategory.id) {
         updates.push({
           categoryId: sibling.id,
-          newParentId: sibling.parentId,
+          newParentId: sibling.parentId || null,
           newSortOrder: index + 1,
         })
       }

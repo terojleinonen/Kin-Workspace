@@ -45,6 +45,21 @@
 .editor-height-lg { height: 400px; }
 .editor-height-xl { height: 500px; }
 
+/* Editor container styles for ReactQuill */
+.editor-container.editor-height-sm .ql-editor { height: calc(200px - 42px); }
+.editor-container.editor-height-md .ql-editor { height: calc(300px - 42px); }
+.editor-container.editor-height-lg .ql-editor { height: calc(400px - 42px); }
+.editor-container.editor-height-xl .ql-editor { height: calc(500px - 42px); }
+
+/* Ensure ReactQuill container takes full height */
+.editor-container .ql-container {
+  height: calc(100% - 42px);
+}
+
+.editor-container .ql-editor {
+  overflow-y: auto;
+}
+
 /* CSS custom properties for truly dynamic values when needed */
 .dynamic-padding-left {
   padding-left: var(--dynamic-padding, 8px);

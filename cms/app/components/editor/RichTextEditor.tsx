@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import DOMPurify from 'dompurify'
 import { PhotoIcon } from '@heroicons/react/24/outline'
-import { createDynamicStyles } from '../../../utils/dynamic-styles'
+import { getEditorHeightClass } from '../../../utils/dynamic-styles'
 
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { 
@@ -107,8 +107,7 @@ export default function RichTextEditor({
   if (!isClient) {
     return (
       <div 
-        className="border border-gray-300 rounded-md bg-gray-100 animate-pulse dynamic-height"
-        style={createDynamicStyles({ dynamicHeight: height })}
+        className={`border border-gray-300 rounded-md bg-gray-100 animate-pulse ${getEditorHeightClass(height)}`}
       />
     )
   }
@@ -131,7 +130,7 @@ export default function RichTextEditor({
       )}
 
       {/* Quill Editor */}
-      <div className="dynamic-height" style={createDynamicStyles({ dynamicHeight: height })}>
+      <div className={`editor-container ${getEditorHeightClass(height)}`}>
         <ReactQuill
           theme="snow"
           value={value}
@@ -140,9 +139,6 @@ export default function RichTextEditor({
           readOnly={disabled}
           modules={modules}
           formats={formats}
-          style={{
-            height: `calc(${height} - 42px)`, // Account for toolbar height
-          }}
         />
       </div>
 
