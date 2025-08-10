@@ -181,11 +181,13 @@ export default function PageList({ onEdit, onDelete, onPreview }: PageListProps)
         {showFilters && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
               <select
+                id="status-filter"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Filter pages by status"
               >
                 <option value="">All Statuses</option>
                 <option value="DRAFT">Draft</option>
@@ -196,11 +198,13 @@ export default function PageList({ onEdit, onDelete, onPreview }: PageListProps)
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Template</label>
+              <label htmlFor="template-filter" className="block text-sm font-medium text-gray-700 mb-1">Template</label>
               <select
+                id="template-filter"
                 value={templateFilter}
                 onChange={(e) => setTemplateFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Filter pages by template"
               >
                 <option value="">All Templates</option>
                 <option value="default">Default</option>
@@ -212,11 +216,13 @@ export default function PageList({ onEdit, onDelete, onPreview }: PageListProps)
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+              <label htmlFor="sort-by-select" className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
               <select
+                id="sort-by-select"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Sort pages by field"
               >
                 <option value="updatedAt">Last Modified</option>
                 <option value="createdAt">Created Date</option>
@@ -226,11 +232,13 @@ export default function PageList({ onEdit, onDelete, onPreview }: PageListProps)
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+              <label htmlFor="sort-order-select" className="block text-sm font-medium text-gray-700 mb-1">Order</label>
               <select
+                id="sort-order-select"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Sort pages in ascending or descending order"
               >
                 <option value="desc">Newest First</option>
                 <option value="asc">Oldest First</option>
