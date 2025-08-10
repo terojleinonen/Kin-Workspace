@@ -1,59 +1,84 @@
 /**
- * Next.js middleware for authentication and route protection
- * Handles authentication checks and redirects
+ * Security Middleware
+ * Applies security measures to all requests
  */
 
-import { withAuth } from 'next-auth/middleware'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
+import { SecurityService } from './lib/security';
 
-export default withAuth(
-  function middleware(req) {
-    // Allow access to public routes
-    if (req.nextUrl.pathname.startsWith('/auth/')) {
-      return NextResponse.next()
-    }
+// Initialize security service
+const securityService = SecurityService.getInstance();
 
-    // Allow access to API health check
-    if (req.nextUrl.pathname === '/api/health') {
-      return NextResponse.next()
-    }
+export function middleware(request: NextRequest) {
+  const response = NextResponse.next();
 
-    // Allow access to public API routes (if any)
-    if (req.nextUrl.pathname.startsWith('/api/public/')) {
-      return NextResponse.next()
-    }
+  // Apply security headers
+  const securityHeaders = securityService.getSecurityHeaders();
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
 
-    // Require authentication for all other routes
-    if (!req.nextauth.token) {
-      const loginUrl = new URL('/auth/login', req.url)
-      loginUrl.searchParams.set('callbackUrl', req.nextUrl.pathname)
-      return NextResponse.redirect(loginUrl)
-    }
+  // Check if IP is blocked
+  const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+                   request.headers.get('x-real-ip') ||
+                   request.ip ||
+                   'unknown';
 
-    return NextResponse.next()
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        // Allow access to public routes without authentication
-        if (req.nextUrl.pathname.startsWith('/auth/')) {
-          return true
-        }
-
-        if (req.nextUrl.pathname === '/api/health') {
-          return true
-        }
-
-        if (req.nextUrl.pathname.startsWith('/api/public/')) {
-          return true
-        }
-
-        // Require authentication for all other routes
-        return !!token
-      },
-    },
+  if (securityService.isIPBlocked(clientIP)) {
+    securityService.logSecurityEvent('unauthorized_access', request, {
+      reason: 'Blocked IP attempted access'
+    });
+    
+    return NextResponse.json(
+      { error: 'Access denied' },
+      { status: 403 }
+    );
   }
-)
+
+  // CSRF protection for state-changing requests
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+    // Skip CSRF for API authentication endpoints
+    if (request.nextUrl.pathname === '/api/auth/token') {
+      return response;
+    }
+
+    const csrfToken = request.headers.get('x-csrf-token');
+    const sessionId = request.headers.get('x-session-id');
+
+    if (!csrfToken || !sessionId) {
+      securityService.logSecurityEvent('csrf_violation', request, {
+        reason: 'Missing CSRF token or session ID'
+      });
+      
+      return NextResponse.json(
+        { error: 'CSRF token required' },
+        { status: 403 }
+      );
+    }
+
+    if (!securityService.verifyCSRFToken(csrfToken, sessionId)) {
+      securityService.logSecurityEvent('csrf_violation', request, {
+        reason: 'Invalid CSRF token'
+      });
+      
+      return NextResponse.json(
+        { error: 'Invalid CSRF token' },
+        { status: 403 }
+      );
+    }
+  }
+
+  // Log suspicious patterns in URLs
+  const url = request.nextUrl.pathname + request.nextUrl.search;
+  if (securityService.detectSQLInjection(url) || securityService.detectXSS(url)) {
+    securityService.logSecurityEvent('suspicious_activity', request, {
+      reason: 'Malicious patterns detected in URL',
+      url
+    });
+  }
+
+  return response;
+}
 
 export const config = {
   matcher: [
