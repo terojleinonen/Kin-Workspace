@@ -26,6 +26,7 @@ model User {
   createdMedia        Media[]           @relation("MediaCreator")
   createdPages        Page[]            @relation("PageCreator")
   contentRevisions    ContentRevision[]
+  createdApiKeys      ApiKey[]          @relation("ApiKeyCreator")
 
   @@map("users")
 }
@@ -182,4 +183,41 @@ model ContentRevision {
   creator User @relation(fields: [createdBy], references: [id])
 
   @@map("content_revisions")
+}
+
+// API Keys for external integrations
+model ApiKey {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.VarChar(255)
+  keyHash     String    @unique @map("key_hash") @db.VarChar(64)
+  permissions String[]  @db.VarChar(100)
+  isActive    Boolean   @default(true) @map("is_active")
+  lastUsed    DateTime? @map("last_used")
+  createdBy   String    @map("created_by") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+  expiresAt   DateTime? @map("expires_at")
+
+  // Relations
+  creator   User           @relation("ApiKeyCreator", fields: [createdBy], references: [id])
+  usageLogs ApiUsageLog[]
+
+  @@map("api_keys")
+}
+
+// API Usage Logging
+model ApiUsageLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  apiKeyId     String   @map("api_key_id") @db.Uuid
+  endpoint     String   @db.VarChar(255)
+  method       String   @db.VarChar(10)
+  statusCode   Int      @map("status_code")
+  responseTime Int      @map("response_time")
+  userAgent    String?  @map("user_agent") @db.Text
+  ipAddress    String?  @map("ip_address") @db.VarChar(45)
+  timestamp    DateTime @default(now())
+
+  // Relations
+  apiKey ApiKey @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
+  @@map("api_usage_logs")
 }

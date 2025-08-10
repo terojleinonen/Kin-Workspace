@@ -117,7 +117,7 @@ This implementation plan breaks down the CMS development into manageable, increm
   - Create exportable reports in CSV and PDF formats
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 15. API Integration for E-commerce
+- [x] 15. API Integration for E-commerce
   - Create public API endpoints for e-commerce site consumption
   - Implement JWT-based API authentication
   - Add API rate limiting and security measures
