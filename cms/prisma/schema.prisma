@@ -27,6 +27,8 @@ model User {
   createdPages        Page[]            @relation("PageCreator")
   contentRevisions    ContentRevision[]
   createdApiKeys      ApiKey[]          @relation("ApiKeyCreator")
+  createdBackups      Backup[]          @relation("BackupCreator")
+  restoredBackups     BackupRestoreLog[] @relation("BackupRestorer")
 
   @@map("users")
 }
@@ -220,4 +222,39 @@ model ApiUsageLog {
   apiKey ApiKey @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 
   @@map("api_usage_logs")
+}
+
+// Backup Management
+model Backup {
+  id          String   @id @default(uuid()) @db.Uuid
+  type        String   @db.VarChar(20) // 'database', 'media', 'full'
+  filename    String   @db.VarChar(255)
+  size        BigInt
+  compressed  Boolean  @default(false)
+  encrypted   Boolean  @default(false)
+  checksum    String   @db.VarChar(64)
+  version     String   @db.VarChar(20)
+  description String?  @db.Text
+  createdBy   String   @map("created_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  creator     User                @relation("BackupCreator", fields: [createdBy], references: [id])
+  restoreLogs BackupRestoreLog[]
+
+  @@map("backups")
+}
+
+// Backup Restore Logging
+model BackupRestoreLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  backupId   String   @map("backup_id") @db.Uuid
+  restoredBy String   @map("restored_by") @db.Uuid
+  restoredAt DateTime @map("restored_at") @default(now())
+
+  // Relations
+  backup   Backup @relation(fields: [backupId], references: [id], onDelete: Cascade)
+  restorer User   @relation("BackupRestorer", fields: [restoredBy], references: [id])
+
+  @@map("backup_restore_logs")
 }
