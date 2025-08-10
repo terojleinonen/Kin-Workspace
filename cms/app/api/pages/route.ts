@@ -1,31 +1,39 @@
 /**
- * Pages API Routes
+ * Pages API
  * Handles CRUD operations for content pages
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth-config'
-import { prisma } from '@/lib/db'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
-// Validation schemas
-const createPageSchema = z.object({
+// Validation schema for page creation/update
+const pageSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255, 'Title too long'),
-  slug: z.string().min(1, 'Slug is required').max(255, 'Slug too long'),
+  slug: z.string().min(1, 'Slug is required').max(255, 'Slug too long')
+    .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   content: z.string().optional(),
   excerpt: z.string().optional(),
   status: z.enum(['DRAFT', 'REVIEW', 'PUBLISHED', 'ARCHIVED']).default('DRAFT'),
   template: z.string().default('default'),
   seoTitle: z.string().max(255, 'SEO title too long').optional(),
-  seoDescription: z.string().optional(),
-  publishedAt: z.string().datetime().optional(),
+  seoDescription: z.string().max(500, 'SEO description too long').optional(),
+  publishedAt: z.string().datetime().optional().nullable()
 })
 
-/**
- * GET /api/pages
- * Retrieve pages with filtering and pagination
- */
+const querySchema = z.object({
+  page: z.string().optional().transform(val => val ? parseInt(val) : 1),
+  limit: z.string().optional().transform(val => val ? parseInt(val) : 10),
+  search: z.string().optional(),
+  status: z.enum(['DRAFT', 'REVIEW', 'PUBLISHED', 'ARCHIVED']).optional(),
+  template: z.string().optional(),
+  sortBy: z.enum(['title', 'createdAt', 'updatedAt', 'publishedAt']).default('updatedAt'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc')
+})
+
+// GET /api/pages - List pages with filtering and pagination
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -34,31 +42,32 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const search = searchParams.get('search')
-    const status = searchParams.get('status')
+    const query = querySchema.parse(Object.fromEntries(searchParams))
 
     // Build where clause
     const where: any = {}
-
-    if (search) {
+    
+    if (query.search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { content: { contains: search, mode: 'insensitive' } },
-        { excerpt: { contains: search, mode: 'insensitive' } },
+        { title: { contains: query.search, mode: 'insensitive' } },
+        { content: { contains: query.search, mode: 'insensitive' } },
+        { excerpt: { contains: query.search, mode: 'insensitive' } }
       ]
     }
 
-    if (status) {
-      where.status = status
+    if (query.status) {
+      where.status = query.status
+    }
+
+    if (query.template) {
+      where.template = query.template
     }
 
     // Calculate pagination
-    const skip = (page - 1) * limit
+    const skip = (query.page - 1) * query.limit
 
-    // Fetch pages with relations
-    const [pages, total] = await Promise.all([
+    // Get pages with pagination
+    const [pages, totalCount] = await Promise.all([
       prisma.page.findMany({
         where,
         include: {
@@ -66,29 +75,41 @@ export async function GET(request: NextRequest) {
             select: {
               id: true,
               name: true,
-              email: true,
-            },
-          },
+              email: true
+            }
+          }
         },
         orderBy: {
-          updatedAt: 'desc',
+          [query.sortBy]: query.sortOrder
         },
         skip,
-        take: limit,
+        take: query.limit
       }),
-      prisma.page.count({ where }),
+      prisma.page.count({ where })
     ])
 
-    const totalPages = Math.ceil(total / limit)
+    const totalPages = Math.ceil(totalCount / query.limit)
 
     return NextResponse.json({
       pages,
-      total,
-      page,
-      limit,
-      totalPages,
+      pagination: {
+        page: query.page,
+        limit: query.limit,
+        totalCount,
+        totalPages,
+        hasNext: query.page < totalPages,
+        hasPrev: query.page > 1
+      }
     })
+
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: error.errors },
+        { status: 400 }
+      )
+    }
+
     console.error('Error fetching pages:', error)
     return NextResponse.json(
       { error: 'Failed to fetch pages' },
@@ -97,54 +118,53 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/**
- * POST /api/pages
- * Create a new page
- */
+// POST /api/pages - Create new page
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
-    const validatedData = createPageSchema.parse(body)
+    const validatedData = pageSchema.parse(body)
 
     // Check if slug already exists
     const existingPage = await prisma.page.findUnique({
-      where: { slug: validatedData.slug },
+      where: { slug: validatedData.slug }
     })
 
     if (existingPage) {
       return NextResponse.json(
-        { error: 'Page with this slug already exists' },
-        { status: 400 }
+        { error: 'A page with this slug already exists' },
+        { status: 409 }
       )
     }
 
+    // Create page
     const page = await prisma.page.create({
       data: {
         ...validatedData,
         publishedAt: validatedData.publishedAt ? new Date(validatedData.publishedAt) : null,
-        createdBy: session.user.id,
+        createdBy: session.user.id
       },
       include: {
         creator: {
           select: {
             id: true,
             name: true,
-            email: true,
-          },
-        },
-      },
+            email: true
+          }
+        }
+      }
     })
 
-    return NextResponse.json({ page }, { status: 201 })
+    return NextResponse.json(page, { status: 201 })
+
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
+        { error: 'Invalid page data', details: error.errors },
         { status: 400 }
       )
     }
