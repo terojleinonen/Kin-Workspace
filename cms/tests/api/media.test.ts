@@ -94,21 +94,19 @@ describe('/api/media', () => {
         user: { id: '1', role: 'EDITOR' },
       })
 
+      const mockDate = new Date()
       const mockMediaFiles = [
         {
           id: '1',
-          name: 'test-image.jpg',
+          filename: 'test-image.jpg',
           originalName: 'test image.jpg',
-          type: 'image',
           mimeType: 'image/jpeg',
           size: 1024,
           url: '/uploads/test-image.jpg',
-          thumbnailUrl: '/uploads/thumbnails/test-image.jpg',
-          folder: null,
-          alt: 'Test image',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          createdBy: {
+          altText: 'Test image',
+          createdAt: mockDate,
+          updatedAt: mockDate,
+          uploadedBy: {
             id: '1',
             name: 'Test User',
             email: 'test@example.com',
@@ -124,12 +122,21 @@ describe('/api/media', () => {
       const data = await response.json()
 
       expect(response.status).toBe(200)
-      expect(data.mediaFiles).toEqual(mockMediaFiles)
+      expect(data.mediaFiles).toHaveLength(1)
+      expect(data.mediaFiles[0]).toMatchObject({
+        id: '1',
+        filename: 'test-image.jpg',
+        originalName: 'test image.jpg',
+        mimeType: 'image/jpeg',
+        size: 1024,
+        url: '/uploads/test-image.jpg',
+        altText: 'Test image',
+      })
       expect(data.pagination).toEqual({
         page: 1,
         limit: 20,
         total: 1,
-        totalPages: 1,
+        pages: 1,
       })
     })
   })

@@ -3,38 +3,38 @@
  * Tests GET, PUT, DELETE operations for specific media files
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals'
 import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { GET, PUT, DELETE } from '../../app/api/media/[id]/route'
 import { prisma } from '../../app/lib/db'
 
 // Mock dependencies
-vi.mock('next-auth', () => ({
-  getServerSession: vi.fn(),
+jest.mock('next-auth', () => ({
+  getServerSession: jest.fn(),
 }))
 
-vi.mock('../../app/lib/db', () => ({
+jest.mock('../../app/lib/db', () => ({
   prisma: {
     media: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     },
   },
 }))
 
-vi.mock('../../app/lib/auth-config', () => ({
+jest.mock('../../app/lib/auth-config', () => ({
   authConfig: {},
 }))
 
 // Mock file system operations
-vi.mock('fs/promises', () => ({
-  unlink: vi.fn(),
+jest.mock('fs/promises', () => ({
+  unlink: jest.fn(),
 }))
 
-vi.mock('fs', () => ({
-  existsSync: vi.fn().mockReturnValue(true),
+jest.mock('fs', () => ({
+  existsSync: jest.fn().mockReturnValue(true),
 }))
 
 const mockGetServerSession = getServerSession as any

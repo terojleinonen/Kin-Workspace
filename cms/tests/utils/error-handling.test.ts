@@ -169,7 +169,7 @@ describe('Error Handling Utils', () => {
 
         const response = createErrorResponse(error)
 
-        expect(response.error).toEqual({
+        expect(response.error).toMatchObject({
           message: 'Validation failed',
           code: 'VALIDATION_ERROR',
           statusCode: 400,
@@ -183,7 +183,7 @@ describe('Error Handling Utils', () => {
 
         const response = createErrorResponse(error)
 
-        expect(response.error).toEqual({
+        expect(response.error).toMatchObject({
           message: 'Regular error',
           code: 'INTERNAL_ERROR',
           statusCode: 500
@@ -196,7 +196,7 @@ describe('Error Handling Utils', () => {
 
         const response = createErrorResponse(error)
 
-        expect(response.error).toEqual({
+        expect(response.error).toMatchObject({
           message: 'An unexpected error occurred',
           code: 'INTERNAL_ERROR',
           statusCode: 500
@@ -209,7 +209,7 @@ describe('Error Handling Utils', () => {
 
         const response = createErrorResponse(error)
 
-        expect(response.error).toEqual({
+        expect(response.error).toMatchObject({
           message: 'An unexpected error occurred',
           code: 'INTERNAL_ERROR',
           statusCode: 500

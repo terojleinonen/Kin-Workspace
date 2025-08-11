@@ -26,6 +26,13 @@ jest.mock('../../app/lib/db', () => ({
   },
 }))
 jest.mock('../../app/lib/password-utils')
+jest.mock('../../app/lib/auth-config', () => ({
+  authConfig: {
+    providers: [],
+    callbacks: {},
+    pages: {},
+  },
+}))
 
 const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>
 const mockHashPassword = hashPassword as jest.MockedFunction<typeof hashPassword>
@@ -308,10 +315,12 @@ describe('/api/users/[id]', () => {
         user: { id: '1', role: UserRole.ADMIN, name: 'Admin', email: 'admin@test.com' }
       } as any)
 
-      mockPrisma.user.findUnique.mockResolvedValue({
-        id: '2',
-        email: 'old@test.com'
-      } as any)
+      mockPrisma.user.findUnique
+        .mockResolvedValueOnce({
+          id: '2',
+          email: 'old@test.com'
+        } as any)
+        .mockResolvedValueOnce(null) // For email uniqueness check
 
       mockPrisma.user.update.mockResolvedValue({
         id: '2',

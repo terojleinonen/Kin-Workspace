@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-config'
+import { authConfig } from '@/lib/auth-config'
 import { prisma } from '@/lib/db'
 import { hashPassword } from '@/lib/password-utils'
 import { UserRole } from '@prisma/client'
@@ -21,7 +21,7 @@ const updateUserSchema = z.object({
 
 // Check if user has admin permissions or is updating their own profile
 async function requireUserAccess(userId: string, requireAdmin = false) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authConfig)
   
   if (!session?.user) {
     return NextResponse.json(

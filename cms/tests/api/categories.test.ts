@@ -14,6 +14,13 @@ import { createMockUser, createMockSession } from '../helpers/auth-helpers'
 jest.mock('next-auth/next', () => ({
   getServerSession: jest.fn(),
 }))
+jest.mock('@/lib/auth-config', () => ({
+  authConfig: {
+    providers: [],
+    callbacks: {},
+    pages: {},
+  },
+}))
 
 describe('/api/categories', () => {
   let mockUser: any

@@ -5,9 +5,9 @@
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals'
 import { NextRequest } from 'next/server'
-import { GET, POST, PUT, DELETE } from '@/app/api/categories/route'
-import { GET as GetSingle, PUT as UpdateSingle, DELETE as DeleteSingle } from '@/app/api/categories/[id]/route'
-import { prisma } from '@/lib/prisma'
+import { GET, POST } from '@/api/categories/route'
+import { GET as GetSingle, PUT as UpdateSingle, DELETE as DeleteSingle } from '@/api/categories/[id]/route'
+import { prisma } from '@/lib/db'
 import { createMockUser, createMockSession } from '../helpers/auth-helpers'
 
 // Mock NextAuth
