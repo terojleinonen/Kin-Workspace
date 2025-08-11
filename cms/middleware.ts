@@ -1,94 +1,86 @@
-/**
- * Security Middleware
- * Applies security measures to all requests
- */
+import { NextRequest, NextResponse } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
-import { NextRequest, NextResponse } from 'next/server';
-import { SecurityService } from './lib/security';
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-// Initialize security service
-const securityService = SecurityService.getInstance();
+  // Handle CORS for public API endpoints
+  if (pathname.startsWith('/api/public/')) {
+    // Handle preflight requests
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, {
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
+            ? 'https://your-ecommerce-domain.com' 
+            : 'http://localhost:3000',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          'Access-Control-Max-Age': '86400',
+        },
+      })
+    }
 
-export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
-
-  // Apply security headers
-  const securityHeaders = securityService.getSecurityHeaders();
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
-
-  // Check if IP is blocked
-  const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0] ||
-                   request.headers.get('x-real-ip') ||
-                   request.ip ||
-                   'unknown';
-
-  if (securityService.isIPBlocked(clientIP)) {
-    securityService.logSecurityEvent('unauthorized_access', request, {
-      reason: 'Blocked IP attempted access'
-    });
+    // Add CORS headers to actual requests
+    const response = NextResponse.next()
+    response.headers.set(
+      'Access-Control-Allow-Origin', 
+      process.env.NODE_ENV === 'production' 
+        ? 'https://your-ecommerce-domain.com' 
+        : 'http://localhost:3000'
+    )
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     
-    return NextResponse.json(
-      { error: 'Access denied' },
-      { status: 403 }
-    );
+    return response
   }
 
-  // CSRF protection for state-changing requests
-  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
-    // Skip CSRF for API authentication endpoints
-    if (request.nextUrl.pathname === '/api/auth/token') {
-      return response;
-    }
+  // Handle media/uploads access
+  if (pathname.startsWith('/uploads/')) {
+    const response = NextResponse.next()
+    response.headers.set(
+      'Access-Control-Allow-Origin', 
+      process.env.NODE_ENV === 'production' 
+        ? 'https://your-ecommerce-domain.com' 
+        : 'http://localhost:3000'
+    )
+    return response
+  }
 
-    const csrfToken = request.headers.get('x-csrf-token');
-    const sessionId = request.headers.get('x-session-id');
-
-    if (!csrfToken || !sessionId) {
-      securityService.logSecurityEvent('csrf_violation', request, {
-        reason: 'Missing CSRF token or session ID'
-      });
-      
+  // Protected routes authentication
+  if (pathname.startsWith('/api/') && !pathname.startsWith('/api/public/') && !pathname.startsWith('/api/auth/')) {
+    const token = await getToken({ req: request })
+    
+    if (!token) {
       return NextResponse.json(
-        { error: 'CSRF token required' },
-        { status: 403 }
-      );
-    }
-
-    if (!securityService.verifyCSRFToken(csrfToken, sessionId)) {
-      securityService.logSecurityEvent('csrf_violation', request, {
-        reason: 'Invalid CSRF token'
-      });
-      
-      return NextResponse.json(
-        { error: 'Invalid CSRF token' },
-        { status: 403 }
-      );
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
     }
   }
 
-  // Log suspicious patterns in URLs
-  const url = request.nextUrl.pathname + request.nextUrl.search;
-  if (securityService.detectSQLInjection(url) || securityService.detectXSS(url)) {
-    securityService.logSecurityEvent('suspicious_activity', request, {
-      reason: 'Malicious patterns detected in URL',
-      url
-    });
+  // Admin routes protection
+  if (pathname.startsWith('/admin') || pathname.startsWith('/(admin)')) {
+    const token = await getToken({ req: request })
+    
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
+
+    // Check if user has admin or editor role
+    if (token.role !== 'ADMIN' && token.role !== 'EDITOR') {
+      return NextResponse.redirect(new URL('/unauthorized', request.url))
+    }
   }
 
-  return response;
+  return NextResponse.next()
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
-  ],
+    '/api/:path*',
+    '/admin/:path*',
+    '/(admin)/:path*',
+    '/uploads/:path*'
+  ]
 }

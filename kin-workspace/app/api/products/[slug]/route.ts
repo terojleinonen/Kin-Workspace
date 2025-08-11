@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { productsDatabase } from '@/app/lib/product-data'
+import { cmsApi, convertCMSProductToEcommerce } from '@/app/lib/cms-api'
 
 export async function GET(
   request: NextRequest,
@@ -8,9 +8,27 @@ export async function GET(
   try {
     const { slug } = await params
     
-    const product = productsDatabase.find(p => p.slug === slug)
+    // Check if CMS API is available
+    const isHealthy = await cmsApi.healthCheck()
     
-    if (!product) {
+    if (isHealthy) {
+      // Try to fetch from CMS first
+      const cmsProduct = await cmsApi.getProductBySlug(slug)
+      
+      if (cmsProduct) {
+        const product = convertCMSProductToEcommerce(cmsProduct)
+        return NextResponse.json({ 
+          product,
+          source: 'cms'
+        })
+      }
+    }
+
+    // Fallback to mock data
+    const { productsDatabase } = await import('@/app/lib/product-data')
+    const mockProduct = productsDatabase.find(p => p.slug === slug)
+    
+    if (!mockProduct) {
       return NextResponse.json(
         { error: 'Product not found' },
         { status: 404 }
@@ -19,27 +37,30 @@ export async function GET(
 
     // Convert to Product format with full variant information
     const productResponse = {
-      id: product.id,
-      name: product.name,
-      price: product.basePrice,
-      image: product.image,
-      category: product.category,
-      slug: product.slug,
-      description: product.description,
-      material: product.material,
-      dimensions: product.dimensions,
-      features: product.features,
-      shipping: product.shipping,
-      rating: product.rating,
-      tags: product.tags,
-      inStock: product.inStock,
-      colors: product.colors,
-      sizes: product.sizes,
-      variants: product.variants,
-      images: product.variants[0]?.images || [product.image]
+      id: mockProduct.id,
+      name: mockProduct.name,
+      price: mockProduct.basePrice,
+      image: mockProduct.image,
+      category: mockProduct.category,
+      slug: mockProduct.slug,
+      description: mockProduct.description,
+      material: mockProduct.material,
+      dimensions: mockProduct.dimensions,
+      features: mockProduct.features,
+      shipping: mockProduct.shipping,
+      rating: mockProduct.rating,
+      tags: mockProduct.tags,
+      inStock: mockProduct.inStock,
+      colors: mockProduct.colors,
+      sizes: mockProduct.sizes,
+      variants: mockProduct.variants,
+      images: mockProduct.variants[0]?.images || [mockProduct.image]
     }
 
-    return NextResponse.json({ product: productResponse })
+    return NextResponse.json({ 
+      product: productResponse,
+      source: 'fallback'
+    })
 
   } catch (error) {
     console.error('Error fetching product:', error)

@@ -1,9 +1,35 @@
 import { NextResponse } from 'next/server'
-import { productsDatabase } from '@/app/lib/product-data'
+import { cmsApi } from '@/app/lib/cms-api'
 
 export async function GET() {
   try {
-    // Get unique categories with product counts
+    // Check if CMS API is available
+    const isHealthy = await cmsApi.healthCheck()
+    
+    if (isHealthy) {
+      // Try to fetch from CMS first
+      const cmsCategories = await cmsApi.getCategories()
+      
+      const categories = cmsCategories.map(category => ({
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        count: category.productCount || 0,
+        inStockCount: category.productCount || 0, // Simplified for now
+        id: category.id,
+        parentId: category.parentId,
+        sortOrder: category.sortOrder
+      }))
+
+      return NextResponse.json({
+        categories,
+        total: categories.length,
+        source: 'cms'
+      })
+    }
+
+    // Fallback to mock data
+    const { productsDatabase } = await import('@/app/lib/product-data')
     const categoryStats = productsDatabase.reduce((acc, product) => {
       const category = product.category
       if (!acc[category]) {
@@ -25,7 +51,8 @@ export async function GET() {
 
     return NextResponse.json({
       categories,
-      total: categories.length
+      total: categories.length,
+      source: 'fallback'
     })
 
   } catch (error) {
