@@ -3,6 +3,8 @@
  * Provides unified access to CMS data for the e-commerce frontend
  */
 
+import { apiLogger } from './integration-logger'
+
 const CMS_API_URL = process.env.CMS_API_URL || 'http://localhost:3001/api'
 
 export interface CMSProduct {
@@ -74,6 +76,9 @@ class CMSApiService {
     page: number
     totalPages: number
   }> {
+    const startTime = Date.now()
+    apiLogger.debug('Fetching products from CMS', filters)
+
     const params = new URLSearchParams()
     
     // Default to published products only for e-commerce
@@ -90,13 +95,31 @@ class CMSApiService {
     if (filters.sortBy) params.append('sortBy', filters.sortBy)
     if (filters.sortOrder) params.append('sortOrder', filters.sortOrder)
 
-    const response = await fetch(`${this.baseUrl}/public/products?${params}`)
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.statusText}`)
-    }
+    try {
+      const response = await fetch(`${this.baseUrl}/public/products?${params}`)
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch products: ${response.statusText}`)
+      }
 
-    return response.json()
+      const result = await response.json()
+      const duration = Date.now() - startTime
+      
+      apiLogger.info('Products fetched successfully', {
+        count: result.products.length,
+        total: result.total,
+        duration: `${duration}ms`
+      })
+
+      return result
+    } catch (error) {
+      const duration = Date.now() - startTime
+      apiLogger.error('Failed to fetch products', error as Error, {
+        filters,
+        duration: `${duration}ms`
+      })
+      throw error
+    }
   }
 
   /**
