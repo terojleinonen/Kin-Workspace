@@ -95,7 +95,7 @@ export default function PageForm({ page }: PageFormProps) {
         throw new Error(errorData.error || 'Failed to save page')
       }
 
-      router.push('/pages')
+      router.push('/admin/pages')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {

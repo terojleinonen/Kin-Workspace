@@ -18,7 +18,7 @@ export default function Dashboard() {
               Manage your product catalog, inventory, and pricing.
             </p>
             <Link 
-              href="/products" 
+              href="/admin/products" 
               className="inline-block bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
             >
               Manage Products

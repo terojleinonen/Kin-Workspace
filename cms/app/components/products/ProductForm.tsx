@@ -104,7 +104,7 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
           throw new Error(errorData.error || 'Failed to save product')
         }
 
-        router.push('/products')
+        router.push('/admin/products')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')

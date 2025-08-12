@@ -45,13 +45,13 @@ const navigation: NavigationItem[] = [
   },
   {
     name: 'Products',
-    href: '/products',
+    href: '/admin/products',
     icon: CubeIcon,
     requiredRole: UserRole.EDITOR,
   },
   {
     name: 'Categories',
-    href: '/categories',
+    href: '/admin/categories',
     icon: TagIcon,
     requiredRole: UserRole.EDITOR,
   },
@@ -63,7 +63,7 @@ const navigation: NavigationItem[] = [
   },
   {
     name: 'Pages',
-    href: '/pages',
+    href: '/admin/pages',
     icon: DocumentTextIcon,
     requiredRole: UserRole.EDITOR,
   },
@@ -75,7 +75,7 @@ const navigation: NavigationItem[] = [
   },
   {
     name: 'Analytics',
-    href: '/analytics',
+    href: '/admin/analytics',
     icon: ChartBarIcon,
   },
   {

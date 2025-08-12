@@ -59,17 +59,19 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Admin routes protection
-  if (pathname.startsWith('/admin') || pathname.startsWith('/(admin)')) {
+  // Protected CMS routes (everything except auth and public API)
+  if (!pathname.startsWith('/auth/') && !pathname.startsWith('/api/auth/') && !pathname.startsWith('/api/public/')) {
     const token = await getToken({ req: request })
     
     if (!token) {
       return NextResponse.redirect(new URL('/auth/login', request.url))
     }
 
-    // Check if user has admin or editor role
-    if (token.role !== 'ADMIN' && token.role !== 'EDITOR') {
-      return NextResponse.redirect(new URL('/unauthorized', request.url))
+    // Check if user has admin or editor role for admin routes
+    if (pathname.startsWith('/admin')) {
+      if (token.role !== 'ADMIN' && token.role !== 'EDITOR') {
+        return NextResponse.redirect(new URL('/unauthorized', request.url))
+      }
     }
   }
 
@@ -78,9 +80,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/api/:path*',
-    '/admin/:path*',
-    '/(admin)/:path*',
-    '/uploads/:path*'
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ]
 }

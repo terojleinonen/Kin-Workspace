@@ -134,7 +134,7 @@ export default function ProductsPage() {
           </p>
         </div>
         <Link
-          href="/products/new"
+          href="/admin/products/new"
           className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <PlusIcon className="h-4 w-4 mr-2" />
@@ -282,7 +282,7 @@ export default function ProductsPage() {
             </p>
             {!filters.search && !filters.status && (
               <Link
-                href="/products/new"
+                href="/admin/products/new"
                 className="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />
@@ -365,14 +365,14 @@ export default function ProductsPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2">
                           <Link
-                            href={`/products/${product.id}`}
+                            href={`/admin/products/${product.id}`}
                             className="text-blue-600 hover:text-blue-900"
                             title="View product"
                           >
                             <EyeIcon className="h-4 w-4" />
                           </Link>
                           <Link
-                            href={`/products/${product.id}/edit`}
+                            href={`/admin/products/${product.id}/edit`}
                             className="text-indigo-600 hover:text-indigo-900"
                             title="Edit product"
                           >

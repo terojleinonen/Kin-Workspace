@@ -19,12 +19,13 @@ interface BreadcrumbItem {
 // Map of paths to readable names
 const pathNameMap: Record<string, string> = {
   '/': 'Dashboard',
-  '/products': 'Products',
-  '/categories': 'Categories',
+  '/admin': 'Admin',
+  '/admin/products': 'Products',
+  '/admin/categories': 'Categories',
+  '/admin/pages': 'Pages',
+  '/admin/analytics': 'Analytics',
   '/media': 'Media Library',
-  '/pages': 'Pages',
   '/users': 'Users',
-  '/analytics': 'Analytics',
   '/settings': 'Settings',
   '/profile': 'Profile',
 }
