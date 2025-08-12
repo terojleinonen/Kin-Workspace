@@ -5,8 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authConfig } from '@/lib/auth-config'
-import { prisma } from '@/lib/db'
+import { authOptions } from '../../lib/auth-config'
+import { prisma } from '../../lib/db'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { v4 as uuidv4 } from 'uuid'
@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid'
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authConfig)
+    const session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json({ 
         error: { code: 'UNAUTHORIZED', message: 'Authentication required' } 
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authConfig)
+    const session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json({ 
         error: { code: 'UNAUTHORIZED', message: 'Authentication required' } 

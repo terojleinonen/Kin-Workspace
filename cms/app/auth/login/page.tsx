@@ -7,25 +7,27 @@ import { Suspense } from 'react'
 import LoginForm from '../../components/auth/LoginForm'
 
 interface LoginPageProps {
-  searchParams: {
+  searchParams: Promise<{
     callbackUrl?: string
     error?: string
     message?: string
-  }
+  }>
 }
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams
+  
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div>
-        {searchParams.message && (
+        {params.message && (
           <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50">
-            {searchParams.message}
+            {params.message}
           </div>
         )}
         <LoginForm 
-          callbackUrl={searchParams.callbackUrl} 
-          error={searchParams.error}
+          callbackUrl={params.callbackUrl} 
+          error={params.error}
         />
       </div>
     </Suspense>
