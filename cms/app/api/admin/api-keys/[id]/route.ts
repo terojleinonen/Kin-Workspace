@@ -23,7 +23,7 @@ const updateApiKeySchema = z.object({
 // GET /api/admin/api-keys/[id] - Get specific API key
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -68,7 +68,7 @@ export async function GET(
 // PUT /api/admin/api-keys/[id] - Update API key
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -134,7 +134,7 @@ export async function PUT(
 // DELETE /api/admin/api-keys/[id] - Delete API key
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);

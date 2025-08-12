@@ -26,7 +26,7 @@ const updatePageSchema = z.object({
 // GET /api/pages/[id] - Get specific page
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -65,7 +65,7 @@ export async function GET(
 // PUT /api/pages/[id] - Update page
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -146,7 +146,7 @@ export async function PUT(
 // DELETE /api/pages/[id] - Delete page
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)

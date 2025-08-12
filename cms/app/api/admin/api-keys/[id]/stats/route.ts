@@ -11,7 +11,7 @@ import { ApiAuthService } from '@/lib/api-auth';
 // GET /api/admin/api-keys/[id]/stats - Get API key usage statistics
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);

@@ -18,7 +18,7 @@ const previewSchema = z.object({
 // POST /api/pages/[id]/preview - Generate preview for page
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -84,7 +84,7 @@ export async function POST(
 // GET /api/pages/[id]/preview - Get preview URL for page
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)

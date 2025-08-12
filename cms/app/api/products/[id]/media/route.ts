@@ -29,7 +29,7 @@ const setPrimaryMediaSchema = z.object({
 // GET /api/products/[id]/media - Get product media
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -91,7 +91,7 @@ export async function GET(
 // POST /api/products/[id]/media - Add media to product
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -201,7 +201,7 @@ export async function POST(
 // PUT /api/products/[id]/media - Update media order or set primary
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -279,7 +279,7 @@ export async function PUT(
 // DELETE /api/products/[id]/media - Remove media from product
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
