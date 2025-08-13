@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import ProductForm from '@/components/products/ProductForm'
+import ProductForm from '@/app/components/products/ProductForm'
 import { Product } from '@/lib/types'
 
 export default function EditProductPage() {

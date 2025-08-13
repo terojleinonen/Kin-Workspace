@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Page } from '@/lib/types'
-import RichTextEditorWithMedia from '@/components/editor/RichTextEditorWithMedia'
+import RichTextEditorWithMedia from '@/app/components/editor/RichTextEditorWithMedia'
 
 interface PageFormData {
   title: string
