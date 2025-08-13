@@ -1,8 +1,3 @@
-/**
- * NextAuth.js TypeScript type extensions
- * Extends the default NextAuth types with custom user properties
- */
-
 import { UserRole } from '@prisma/client'
 import NextAuth from 'next-auth'
 
