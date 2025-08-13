@@ -47,7 +47,7 @@ export default function OrdersPage() {
           </h3>
           
           <p className="text-slate-gray mb-6 font-inter max-w-md mx-auto">
-            When customers place orders through your Kin Workspace store, they'll appear here. 
+            When customers place orders through your Kin Workspace store, they&apos;ll appear here. 
             You can track, process, and manage all orders from this dashboard.
           </p>
 

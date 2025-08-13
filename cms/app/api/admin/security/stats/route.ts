@@ -1,6 +1,6 @@
 /**
- * CSRF Token API
- * Provides CSRF tokens for client-side requests
+ * Security Statistics API
+ * Provides security statistics and metrics
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -8,27 +8,23 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
 import { SecurityService } from '@/app/lib/security';
 
-// GET /api/csrf-token - Get CSRF token
+// GET /api/admin/security/stats - Get security statistics
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const securityService = SecurityService.getInstance();
-    const sessionId = session.user.id; // Use user ID as session identifier
-    const csrfToken = securityService.generateCSRFToken(sessionId);
+    const stats = securityService.getSecurityStats();
 
-    return NextResponse.json({ 
-      csrfToken,
-      sessionId 
-    });
+    return NextResponse.json({ stats });
 
   } catch (error) {
-    console.error('Error generating CSRF token:', error);
+    console.error('Error fetching security stats:', error);
     return NextResponse.json(
-      { error: 'Failed to generate CSRF token' },
+      { error: 'Failed to fetch security statistics' },
       { status: 500 }
     );
   }

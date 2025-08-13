@@ -5,8 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { WorkflowService, WorkflowAction } from '@/lib/workflow';
+import { authOptions } from '@/app/lib/auth';
+import { WorkflowService, WorkflowAction } from '@/app/lib/workflow';
 import { z } from 'zod';
 
 // Validation schemas

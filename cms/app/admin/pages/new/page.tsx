@@ -5,7 +5,7 @@
 
 'use client'
 
-import PageForm from '@/components/pages/PageForm'
+import PageForm from '@/app/components/pages/PageForm'
 
 export default function NewPagePage() {
   return (

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDatabaseHealth } from '@/lib/db'
+import { getDatabaseHealth } from '@/app/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
