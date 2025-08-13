@@ -110,21 +110,22 @@ function SidebarContent({ userRole }: { userRole?: UserRole }) {
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center h-16 px-6 bg-gray-900">
+      <div className="flex items-center h-16 px-6 bg-matte-black">
         <div className="flex items-center">
           <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">K</span>
+            <div className="w-8 h-8 bg-dusty-sage rounded-lg flex items-center justify-center">
+              <span className="text-soft-white font-bold text-sm font-satoshi">K</span>
             </div>
           </div>
           <div className="ml-3">
-            <h1 className="text-white font-semibold text-lg">Kin CMS</h1>
+            <h1 className="text-soft-white font-semibold text-lg font-satoshi">Kin Workspace</h1>
+            <p className="text-warm-beige text-xs font-inter">CMS</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-1 bg-gray-800">
+      <nav className="flex-1 px-4 py-6 space-y-1 bg-slate-gray">
         {filteredNavigation.map((item) => {
           const isActive = pathname === item.href
           
@@ -133,23 +134,21 @@ function SidebarContent({ userRole }: { userRole?: UserRole }) {
               key={item.name}
               href={item.href}
               className={clsx(
-                'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150',
-                isActive
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                'sidebar-link',
+                isActive && 'active'
               )}
             >
               <item.icon
                 className={clsx(
                   'mr-3 h-5 w-5 flex-shrink-0',
                   isActive
-                    ? 'text-white'
-                    : 'text-gray-400 group-hover:text-white'
+                    ? 'text-soft-white'
+                    : 'text-warm-beige'
                 )}
               />
               {item.name}
               {item.badge && (
-                <span className="ml-auto inline-block py-0.5 px-2 text-xs font-medium rounded-full bg-blue-600 text-white">
+                <span className="ml-auto inline-block py-0.5 px-2 text-xs font-medium rounded-full bg-dusty-sage text-soft-white font-inter">
                   {item.badge}
                 </span>
               )}
@@ -159,18 +158,18 @@ function SidebarContent({ userRole }: { userRole?: UserRole }) {
       </nav>
 
       {/* User role indicator */}
-      <div className="px-4 py-4 bg-gray-900 border-t border-gray-700">
+      <div className="px-4 py-4 bg-matte-black border-t border-slate-gray">
         <div className="flex items-center">
           <div className="flex-shrink-0">
             <div className={clsx(
               'w-2 h-2 rounded-full',
-              userRole === UserRole.ADMIN ? 'bg-red-400' :
-              userRole === UserRole.EDITOR ? 'bg-yellow-400' :
-              'bg-green-400'
+              userRole === UserRole.ADMIN ? 'bg-dusty-sage' :
+              userRole === UserRole.EDITOR ? 'bg-warm-beige' :
+              'bg-soft-white'
             )} />
           </div>
           <div className="ml-3">
-            <p className="text-sm font-medium text-gray-300">
+            <p className="text-sm font-medium text-warm-beige font-inter">
               {userRole || 'Unknown'} Role
             </p>
           </div>
@@ -195,7 +194,7 @@ export default function Sidebar({ isOpen, onClose, userRole }: SidebarProps) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-gray-900/80" />
+            <div className="fixed inset-0 bg-matte-black/80" />
           </Transition.Child>
 
           <div className="fixed inset-0 flex">
@@ -216,10 +215,10 @@ export default function Sidebar({ isOpen, onClose, userRole }: SidebarProps) {
                     onClick={onClose}
                   >
                     <span className="sr-only">Close sidebar</span>
-                    <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                    <XMarkIcon className="h-6 w-6 text-soft-white" aria-hidden="true" />
                   </button>
                 </div>
-                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-800 px-6 pb-4">
+                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-gray px-6 pb-4">
                   <SidebarContent userRole={userRole} />
                 </div>
               </Dialog.Panel>
@@ -230,7 +229,7 @@ export default function Sidebar({ isOpen, onClose, userRole }: SidebarProps) {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-800">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-gray">
           <SidebarContent userRole={userRole} />
         </div>
       </div>

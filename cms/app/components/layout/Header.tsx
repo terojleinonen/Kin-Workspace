@@ -45,11 +45,11 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
   }
 
   return (
-    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-warm-beige bg-soft-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
       {/* Mobile menu button */}
       <button
         type="button"
-        className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+        className="-m-2.5 p-2.5 text-slate-gray lg:hidden hover:text-matte-black transition-colors duration-200"
         onClick={onMenuClick}
       >
         <span className="sr-only">Open sidebar</span>
@@ -57,7 +57,7 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
       </button>
 
       {/* Separator */}
-      <div className="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
+      <div className="h-6 w-px bg-warm-beige lg:hidden" aria-hidden="true" />
 
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
         {/* Search bar placeholder */}
@@ -71,7 +71,7 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
           {/* Notifications button */}
           <button
             type="button"
-            className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
+            className="-m-2.5 p-2.5 text-slate-gray hover:text-matte-black transition-colors duration-200"
           >
             <span className="sr-only">View notifications</span>
             <BellIcon className="h-6 w-6" aria-hidden="true" />
@@ -79,28 +79,28 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
 
           {/* Separator */}
           <div
-            className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200"
+            className="hidden lg:block lg:h-6 lg:w-px lg:bg-warm-beige"
             aria-hidden="true"
           />
 
           {/* Profile dropdown */}
           <Menu as="div" className="relative">
-            <Menu.Button className="-m-1.5 flex items-center p-1.5">
+            <Menu.Button className="-m-1.5 flex items-center p-1.5 hover:bg-warm-beige rounded-lg transition-colors duration-200">
               <span className="sr-only">Open user menu</span>
-              <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                <span className="text-sm font-medium text-gray-700">
+              <div className="h-8 w-8 rounded-full bg-dusty-sage flex items-center justify-center">
+                <span className="text-sm font-medium text-soft-white font-inter">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </span>
               </div>
               <span className="hidden lg:flex lg:items-center">
                 <span
-                  className="ml-4 text-sm font-semibold leading-6 text-gray-900"
+                  className="ml-4 text-sm font-semibold leading-6 text-matte-black font-satoshi"
                   aria-hidden="true"
                 >
                   {user?.name || 'User'}
                 </span>
                 <svg
-                  className="ml-2 h-5 w-5 text-gray-400"
+                  className="ml-2 h-5 w-5 text-slate-gray"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
@@ -122,16 +122,16 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 z-10 mt-2.5 w-56 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+              <Menu.Items className="absolute right-0 z-10 mt-2.5 w-56 origin-top-right rounded-md bg-soft-white py-2 shadow-lg ring-1 ring-warm-beige focus:outline-none">
                 {/* User info */}
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">
+                <div className="px-4 py-3 border-b border-warm-beige">
+                  <p className="text-sm font-medium text-matte-black font-satoshi">
                     {user?.name || 'User'}
                   </p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm text-slate-gray truncate font-inter">
                     {user?.email || 'user@example.com'}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-slate-gray mt-1 font-inter">
                     {user?.role || 'Unknown'} Role
                   </p>
                 </div>
@@ -143,11 +143,11 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
                       <a
                         href={item.href}
                         className={clsx(
-                          active ? 'bg-gray-50' : '',
-                          'flex items-center px-4 py-2 text-sm text-gray-700'
+                          active ? 'bg-warm-beige' : '',
+                          'flex items-center px-4 py-2 text-sm text-slate-gray font-inter hover:bg-warm-beige hover:text-matte-black transition-colors duration-200'
                         )}
                       >
-                        <item.icon className="mr-3 h-4 w-4 text-gray-400" />
+                        <item.icon className="mr-3 h-4 w-4 text-slate-gray" />
                         {item.name}
                       </a>
                     )}
@@ -158,13 +158,14 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
                 <Menu.Item>
                   {({ active }) => (
                     <button
+                      type="button"
                       onClick={handleSignOut}
                       className={clsx(
-                        active ? 'bg-gray-50' : '',
-                        'flex w-full items-center px-4 py-2 text-sm text-gray-700'
+                        active ? 'bg-warm-beige' : '',
+                        'flex w-full items-center px-4 py-2 text-sm text-slate-gray font-inter hover:bg-warm-beige hover:text-matte-black transition-colors duration-200'
                       )}
                     >
-                      <ArrowRightOnRectangleIcon className="mr-3 h-4 w-4 text-gray-400" />
+                      <ArrowRightOnRectangleIcon className="mr-3 h-4 w-4 text-slate-gray" />
                       Sign out
                     </button>
                   )}

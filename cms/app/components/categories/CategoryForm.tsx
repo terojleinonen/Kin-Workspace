@@ -103,16 +103,16 @@ export default function CategoryForm({
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 bg-matte-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border border-warm-beige w-full max-w-md shadow-lg rounded-md bg-soft-white">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">
+          <h3 className="text-lg font-medium text-matte-black font-satoshi">
             {isEditing ? 'Edit Category' : 'Create Category'}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-slate-gray hover:text-matte-black transition-colors duration-200"
             aria-label="Close dialog"
             title="Close dialog"
           >
@@ -139,7 +139,7 @@ export default function CategoryForm({
 
           {/* Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="form-label">
               Name *
             </label>
             <input
@@ -148,7 +148,7 @@ export default function CategoryForm({
               required
               value={formData.name}
               onChange={(e) => handleNameChange(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="form-input"
               placeholder="Enter category name"
             />
           </div>
@@ -209,14 +209,14 @@ export default function CategoryForm({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="btn-outline"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="btn-primary disabled:opacity-50"
             >
               {loading ? 'Saving...' : isEditing ? 'Update' : 'Create'}
             </button>
