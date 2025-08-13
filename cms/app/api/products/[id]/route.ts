@@ -43,8 +43,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         creator: {
           select: {
@@ -82,7 +84,15 @@ export async function GET(
       )
     }
 
-    return NextResponse.json({ product })
+    // Transform Decimal fields to numbers for JSON response
+    const transformedProduct = {
+      ...product,
+      price: product.price.toNumber(),
+      comparePrice: product.comparePrice?.toNumber() || null,
+      weight: product.weight?.toNumber() || null,
+    }
+
+    return NextResponse.json({ product: transformedProduct })
   } catch (error) {
     console.error('Error fetching product:', error)
     return NextResponse.json(
@@ -106,12 +116,13 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
     const validatedData = updateProductSchema.parse(body)
 
     // Check if product exists
     const existingProduct = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!existingProduct) {
@@ -188,7 +199,7 @@ export async function PUT(
     const product = await prisma.$transaction(async (tx) => {
       // Update product data
       const updatedProduct = await tx.product.update({
-        where: { id: params.id },
+        where: { id },
         data: processedUpdateData,
       })
 
@@ -196,14 +207,14 @@ export async function PUT(
       if (categoryIds !== undefined) {
         // Remove existing category associations
         await tx.productCategory.deleteMany({
-          where: { productId: params.id },
+          where: { productId: id },
         })
 
         // Add new category associations
         if (categoryIds.length > 0) {
           await tx.productCategory.createMany({
             data: categoryIds.map(categoryId => ({
-              productId: params.id,
+              productId: id,
               categoryId,
             })),
           })
@@ -212,7 +223,7 @@ export async function PUT(
 
       // Return updated product with relations
       return await tx.product.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
           creator: {
             select: {
@@ -244,7 +255,15 @@ export async function PUT(
       })
     })
 
-    return NextResponse.json({ product })
+    // Transform Decimal fields to numbers for JSON response
+    const transformedProduct = {
+      ...product,
+      price: product.price.toNumber(),
+      comparePrice: product.comparePrice?.toNumber() || null,
+      weight: product.weight?.toNumber() || null,
+    }
+
+    return NextResponse.json({ product: transformedProduct })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -275,9 +294,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Check if product exists
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!product) {
@@ -289,7 +310,7 @@ export async function DELETE(
 
     // Delete product (cascade will handle related records)
     await prisma.product.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ message: 'Product deleted successfully' })

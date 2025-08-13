@@ -142,8 +142,16 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil(total / limit)
 
+    // Transform Decimal fields to numbers for JSON response
+    const transformedProducts = products.map(product => ({
+      ...product,
+      price: product.price.toNumber(),
+      comparePrice: product.comparePrice?.toNumber() || null,
+      weight: product.weight?.toNumber() || null,
+    }))
+
     return NextResponse.json({
-      products,
+      products: transformedProducts,
       total,
       page,
       limit,
@@ -260,7 +268,15 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ product }, { status: 201 })
+    // Transform Decimal fields to numbers for JSON response
+    const transformedProduct = {
+      ...product,
+      price: product.price.toNumber(),
+      comparePrice: product.comparePrice?.toNumber() || null,
+      weight: product.weight?.toNumber() || null,
+    }
+
+    return NextResponse.json({ product: transformedProduct }, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

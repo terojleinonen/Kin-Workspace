@@ -53,7 +53,7 @@ const config = {
     }
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(@auth/prisma-adapter|@testing-library)/)',
+    'node_modules/(?!(@auth/prisma-adapter|@testing-library|next-auth|@auth)/)',
   ],
   collectCoverageFrom: [
     'app/**/*.{ts,tsx}',

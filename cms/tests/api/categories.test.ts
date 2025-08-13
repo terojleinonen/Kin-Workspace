@@ -27,9 +27,11 @@ describe('/api/categories', () => {
   let mockSession: any
 
   beforeEach(async () => {
-    // Clean up categories table
+    // Clean up all related tables in correct order
     await prisma.productCategory.deleteMany()
+    await prisma.product.deleteMany()
     await prisma.category.deleteMany()
+    await prisma.user.deleteMany()
     
     // Create mock user and session
     mockUser = await createMockUser({ role: 'ADMIN' })
@@ -40,7 +42,9 @@ describe('/api/categories', () => {
   })
 
   afterEach(async () => {
+    // Clean up all related tables in correct order
     await prisma.productCategory.deleteMany()
+    await prisma.product.deleteMany()
     await prisma.category.deleteMany()
     await prisma.user.deleteMany()
   })

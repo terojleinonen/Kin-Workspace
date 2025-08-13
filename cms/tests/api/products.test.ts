@@ -349,11 +349,12 @@ describe('/api/products', () => {
     })
 
     it('should return 404 for non-existent product', async () => {
-      const request = new NextRequest('http://localhost:3000/api/products/non-existent-id', {
+      const nonExistentId = '00000000-0000-0000-0000-000000000000'
+      const request = new NextRequest(`http://localhost:3000/api/products/${nonExistentId}`, {
         method: 'DELETE',
       })
 
-      const response = await DeleteSingle(request, { params: { id: 'non-existent-id' } })
+      const response = await DeleteSingle(request, { params: { id: nonExistentId } })
 
       expect(response.status).toBe(404)
     })
