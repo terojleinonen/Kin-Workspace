@@ -4,3 +4,4 @@
 
 export * from './file-utils';
 export * from './complexity-calculator';
+export * from './naming-integration';
