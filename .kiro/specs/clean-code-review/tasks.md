@@ -18,7 +18,7 @@
     - Write comprehensive tests for AST parsing functionality
     - _Requirements: 1.1, 2.1_
 
-  - [ ] 2.2 Build complexity calculation module
+  - [x] 2.2 Build complexity calculation module
     - Replace placeholder complexity calculations with AST-based analysis
     - Implement proper cyclomatic complexity using control flow analysis
     - Add cognitive complexity metrics based on nested structures

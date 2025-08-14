@@ -5,6 +5,7 @@
 import * as ts from 'typescript';
 import * as fs from 'fs';
 import { ComplexityMetrics, CodeLocation } from '../types';
+import { calculateASTComplexity } from '../utils/complexity-calculator';
 
 export interface FunctionInfo {
   name: string;
@@ -133,7 +134,7 @@ export class TypeScriptAnalyzer implements CodeAnalyzer {
   }
 
   getMetrics(analysis: FileAnalysis): ComplexityMetrics {
-    // This will be implemented in task 2.2
+    // Return the already calculated complexity metrics
     return analysis.complexity;
   }
 
@@ -316,99 +317,17 @@ export class TypeScriptAnalyzer implements CodeAnalyzer {
   }
 
   private calculateFunctionComplexity(node: ts.Node): ComplexityMetrics {
-    let cyclomaticComplexity = 1; // Base complexity
-    let cognitiveComplexity = 0;
-    let nestingDepth = 0;
-    let currentDepth = 0;
-    let maxDepth = 0;
-    let lineCount = 0;
-    let parameterCount = 0;
-
-    // Count parameters
-    if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node) || 
-        ts.isArrowFunction(node) || ts.isFunctionExpression(node)) {
-      parameterCount = node.parameters.length;
-    }
-
-    // Calculate line count
+    // Extract the function source code and use the enhanced complexity calculator
     const sourceFile = node.getSourceFile();
-    const start = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-    const end = sourceFile.getLineAndCharacterOfPosition(node.getEnd());
-    lineCount = end.line - start.line + 1;
-
-    const visit = (node: ts.Node, depth: number = 0) => {
-      currentDepth = depth;
-      maxDepth = Math.max(maxDepth, currentDepth);
-
-      // Cyclomatic complexity - decision points
-      if (ts.isIfStatement(node) || ts.isConditionalExpression(node) ||
-          ts.isWhileStatement(node) || ts.isForStatement(node) ||
-          ts.isForInStatement(node) || ts.isForOfStatement(node) ||
-          ts.isDoStatement(node) || ts.isSwitchStatement(node) ||
-          ts.isCaseClause(node) || ts.isCatchClause(node)) {
-        cyclomaticComplexity++;
-        cognitiveComplexity += (depth + 1);
-      }
-
-      // Logical operators
-      if (ts.isBinaryExpression(node) && 
-          (node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken ||
-           node.operatorToken.kind === ts.SyntaxKind.BarBarToken)) {
-        cyclomaticComplexity++;
-        cognitiveComplexity++;
-      }
-
-      // Increase nesting depth for certain constructs
-      const shouldIncreaseDepth = ts.isIfStatement(node) || ts.isWhileStatement(node) ||
-                                  ts.isForStatement(node) || ts.isForInStatement(node) ||
-                                  ts.isForOfStatement(node) || ts.isDoStatement(node) ||
-                                  ts.isTryStatement(node) || ts.isSwitchStatement(node);
-
-      ts.forEachChild(node, child => visit(child, shouldIncreaseDepth ? depth + 1 : depth));
-    };
-
-    visit(node);
-    nestingDepth = maxDepth;
-
-    return {
-      cyclomaticComplexity,
-      cognitiveComplexity,
-      nestingDepth,
-      lineCount,
-      parameterCount
-    };
+    const functionText = sourceFile.text.substring(node.getStart(), node.getEnd());
+    
+    // Use the enhanced AST-based complexity calculator
+    return calculateASTComplexity(functionText, sourceFile.fileName);
   }
 
   private calculateFileComplexity(sourceFile: ts.SourceFile): ComplexityMetrics {
-    let totalCyclomatic = 0;
-    let totalCognitive = 0;
-    let maxNesting = 0;
-    const totalLines = sourceFile.text.trim() === '' ? 0 : sourceFile.text.split('\n').length;
-    let totalParams = 0;
-    let functionCount = 0;
-
-    const visit = (node: ts.Node) => {
-      if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node) || 
-          ts.isArrowFunction(node) || ts.isFunctionExpression(node)) {
-        const complexity = this.calculateFunctionComplexity(node);
-        totalCyclomatic += complexity.cyclomaticComplexity;
-        totalCognitive += complexity.cognitiveComplexity;
-        maxNesting = Math.max(maxNesting, complexity.nestingDepth);
-        totalParams += complexity.parameterCount;
-        functionCount++;
-      }
-      ts.forEachChild(node, visit);
-    };
-
-    visit(sourceFile);
-
-    return {
-      cyclomaticComplexity: functionCount > 0 ? Math.round(totalCyclomatic / functionCount) : 0,
-      cognitiveComplexity: functionCount > 0 ? Math.round(totalCognitive / functionCount) : 0,
-      nestingDepth: maxNesting,
-      lineCount: totalLines,
-      parameterCount: functionCount > 0 ? Math.round(totalParams / functionCount) : 0
-    };
+    // Use the enhanced AST-based complexity calculator
+    return calculateASTComplexity(sourceFile.text, sourceFile.fileName);
   }
 
   private aggregateComplexity(files: FileAnalysis[]): ComplexityMetrics {
