@@ -81,7 +81,7 @@
     - Write comprehensive tests for recommendation generation
     - _Requirements: 3.1, 3.2_
 
-  - [ ] 5.2 Create effort estimation system
+  - [x] 5.2 Create effort estimation system
     - Implement CleanCodeRecommendationEngine.estimateEffort() method
     - Build complexity-based effort calculation using function/class metrics
     - Add impact assessment algorithms considering code usage frequency

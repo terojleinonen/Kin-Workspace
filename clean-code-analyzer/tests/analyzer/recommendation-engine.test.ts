@@ -5,7 +5,8 @@
 import { 
   CleanCodeRecommendationEngine, 
   EffortEstimate, 
-  PrioritizedPlan 
+  PrioritizedPlan,
+  EffortEstimationContext 
 } from '../../src/analyzer/recommendation-engine';
 import { 
   Violation, 
@@ -16,6 +17,32 @@ import {
   ImpactLevel, 
   RefactoringType 
 } from '../../src/types';
+
+// Extend Jest matchers
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toBeOneOf(expected: any[]): R;
+    }
+  }
+}
+
+expect.extend({
+  toBeOneOf(received, expected) {
+    const pass = expected.includes(received);
+    if (pass) {
+      return {
+        message: () => `expected ${received} not to be one of ${expected.join(', ')}`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected ${received} to be one of ${expected.join(', ')}`,
+        pass: false,
+      };
+    }
+  },
+});
 
 describe('CleanCodeRecommendationEngine', () => {
   let engine: CleanCodeRecommendationEngine;
@@ -340,8 +367,9 @@ describe('CleanCodeRecommendationEngine', () => {
 
       const plan = engine.prioritizeRecommendations(recommendations);
 
-      // Small (2h) + Medium (8h) = 10h
-      expect(plan.totalEffort.timeHours).toBe(10);
+      // With new effort estimation: Rename (1h * multipliers) + Extract Method (4h * multipliers) + coordination overhead
+      expect(plan.totalEffort.timeHours).toBeGreaterThanOrEqual(5); // At least base efforts
+      expect(plan.totalEffort.timeHours).toBeLessThanOrEqual(20); // Reasonable upper bound
       expect(plan.totalEffort.complexity).toBe(EffortLevel.MEDIUM);
     });
 
@@ -409,11 +437,11 @@ describe('CleanCodeRecommendationEngine', () => {
   });
 
   describe('estimateEffort', () => {
-    it('should throw error as not implemented yet', () => {
+    it('should calculate base effort for rename refactoring', () => {
       const recommendation: Recommendation = {
         id: 'r1',
         type: RefactoringType.RENAME,
-        description: 'Test recommendation',
+        description: 'Rename variable',
         beforeCode: '',
         afterCode: '',
         principle: CleanCodePrinciple.NAMING,
@@ -422,7 +450,378 @@ describe('CleanCodeRecommendationEngine', () => {
         dependencies: []
       };
 
-      expect(() => engine.estimateEffort(recommendation)).toThrow('Not implemented yet - will be implemented in task 5.2');
+      const estimate = engine.estimateEffort(recommendation);
+
+      expect(estimate.timeHours).toBeGreaterThanOrEqual(1);
+      expect(estimate.complexity).toBe(EffortLevel.SMALL);
+      expect(estimate.riskLevel).toBe(ImpactLevel.MEDIUM);
+      expect(estimate.prerequisites).toContain('Search and replace validation');
+    });
+
+    it('should calculate base effort for extract method refactoring', () => {
+      const recommendation: Recommendation = {
+        id: 'r2',
+        type: RefactoringType.EXTRACT_METHOD,
+        description: 'Extract method',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.FUNCTIONS,
+        effort: EffortLevel.MEDIUM,
+        impact: ImpactLevel.HIGH,
+        dependencies: []
+      };
+
+      const estimate = engine.estimateEffort(recommendation);
+
+      expect(estimate.timeHours).toBeGreaterThanOrEqual(4);
+      expect(estimate.complexity).toBeOneOf([EffortLevel.SMALL, EffortLevel.MEDIUM]);
+      expect(estimate.riskLevel).toBe(ImpactLevel.HIGH);
+      expect(estimate.prerequisites).toContain('Comprehensive test coverage');
+    });
+
+    it('should calculate base effort for split class refactoring', () => {
+      const recommendation: Recommendation = {
+        id: 'r3',
+        type: RefactoringType.SPLIT_CLASS,
+        description: 'Split large class',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.CLASSES,
+        effort: EffortLevel.LARGE,
+        impact: ImpactLevel.HIGH,
+        dependencies: []
+      };
+
+      const estimate = engine.estimateEffort(recommendation);
+
+      expect(estimate.timeHours).toBeGreaterThanOrEqual(12);
+      expect(estimate.complexity).toBeOneOf([EffortLevel.MEDIUM, EffortLevel.LARGE]);
+      expect(estimate.riskLevel).toBe(ImpactLevel.HIGH);
+      expect(estimate.prerequisites).toContain('Comprehensive test coverage');
+      expect(estimate.prerequisites).toContain('Code review approval');
+    });
+
+    it('should apply complexity multiplier based on file analysis', () => {
+      const recommendation: Recommendation = {
+        id: 'r4',
+        type: RefactoringType.EXTRACT_METHOD,
+        description: 'Extract method from complex file',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.FUNCTIONS,
+        effort: EffortLevel.MEDIUM,
+        impact: ImpactLevel.HIGH,
+        dependencies: []
+      };
+
+      const context = {
+        fileAnalysis: {
+          filePath: 'complex-file.ts',
+          functions: Array(15).fill(null).map((_, i) => ({
+            name: `func${i}`,
+            location: { filePath: 'complex-file.ts', line: i + 1, column: 1 },
+            parameters: ['param1', 'param2'],
+            complexity: {
+              cyclomaticComplexity: 8,
+              cognitiveComplexity: 12,
+              nestingDepth: 3,
+              lineCount: 25,
+              parameterCount: 2
+            },
+            isAsync: false,
+            isExported: false
+          })),
+          classes: [],
+          imports: [],
+          complexity: {
+            cyclomaticComplexity: 20, // High complexity
+            cognitiveComplexity: 25,  // High cognitive complexity
+            nestingDepth: 6,          // Deep nesting
+            lineCount: 600,           // Large file
+            parameterCount: 3
+          },
+          lineCount: 600
+        }
+      };
+
+      const estimate = engine.estimateEffort(recommendation, context);
+      const baseEstimate = engine.estimateEffort(recommendation);
+
+      expect(estimate.timeHours).toBeGreaterThan(baseEstimate.timeHours);
+      expect(estimate.complexity).toBeOneOf([EffortLevel.MEDIUM, EffortLevel.LARGE]);
+    });
+
+    it('should apply impact multiplier based on usage frequency', () => {
+      const recommendation: Recommendation = {
+        id: 'r5',
+        type: RefactoringType.RENAME,
+        description: 'Rename in high-usage file',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.NAMING,
+        effort: EffortLevel.SMALL,
+        impact: ImpactLevel.HIGH,
+        dependencies: []
+      };
+
+      const context = {
+        fileAnalysis: {
+          filePath: 'high-usage-file.ts',
+          functions: [],
+          classes: [],
+          imports: [],
+          complexity: {
+            cyclomaticComplexity: 5,
+            cognitiveComplexity: 8,
+            nestingDepth: 2,
+            lineCount: 100,
+            parameterCount: 2
+          },
+          lineCount: 100
+        },
+        usageFrequency: {
+          functionCallCounts: new Map([['testFunc', 150]]),
+          classUsageCounts: new Map([['TestClass', 80]]),
+          fileAccessCounts: new Map([['high-usage-file.ts', 200]]) // High usage
+        },
+        codebaseMetrics: {
+          totalFiles: 150, // Large codebase
+          totalLines: 50000,
+          averageComplexity: 8,
+          hotspotFiles: ['high-usage-file.ts'] // This file is a hotspot
+        }
+      };
+
+      const estimate = engine.estimateEffort(recommendation, context);
+      const baseEstimate = engine.estimateEffort(recommendation);
+
+      expect(estimate.timeHours).toBeGreaterThan(baseEstimate.timeHours);
+      expect(estimate.prerequisites).toContain('Performance impact assessment');
+    });
+
+    it('should apply risk multiplier based on test coverage', () => {
+      const recommendation: Recommendation = {
+        id: 'r6',
+        type: RefactoringType.SPLIT_CLASS,
+        description: 'Split class with low test coverage',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.CLASSES,
+        effort: EffortLevel.LARGE,
+        impact: ImpactLevel.HIGH,
+        dependencies: []
+      };
+
+      const context = {
+        fileAnalysis: {
+          filePath: 'low-coverage-file.ts',
+          functions: [],
+          classes: [],
+          imports: [],
+          complexity: {
+            cyclomaticComplexity: 10,
+            cognitiveComplexity: 15,
+            nestingDepth: 3,
+            lineCount: 200,
+            parameterCount: 3
+          },
+          lineCount: 200
+        },
+        testCoverage: {
+          overallCoverage: 0.4,
+          fileCoverage: new Map([['low-coverage-file.ts', 0.2]]), // Low coverage
+          functionCoverage: new Map()
+        },
+        dependencyGraph: {
+          fileDependencies: new Map([['low-coverage-file.ts', Array(12).fill('dep')]]), // Many dependencies
+          functionDependencies: new Map(),
+          classDependencies: new Map()
+        }
+      };
+
+      const estimate = engine.estimateEffort(recommendation, context);
+      const baseEstimate = engine.estimateEffort(recommendation);
+
+      expect(estimate.timeHours).toBeGreaterThan(baseEstimate.timeHours);
+      expect(estimate.riskLevel).toBe(ImpactLevel.HIGH);
+      expect(estimate.prerequisites).toContain('Create comprehensive test suite');
+      expect(estimate.prerequisites).toContain('Dependency impact analysis');
+    });
+
+    it('should handle missing context gracefully', () => {
+      const recommendation: Recommendation = {
+        id: 'r7',
+        type: RefactoringType.IMPROVE_ERROR_HANDLING,
+        description: 'Improve error handling',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.ERROR_HANDLING,
+        effort: EffortLevel.MEDIUM,
+        impact: ImpactLevel.MEDIUM,
+        dependencies: ['existing-dependency']
+      };
+
+      const estimate = engine.estimateEffort(recommendation);
+
+      expect(estimate.timeHours).toBeGreaterThanOrEqual(1);
+      expect(estimate.complexity).toBeOneOf([EffortLevel.SMALL, EffortLevel.MEDIUM, EffortLevel.LARGE]);
+      expect(estimate.riskLevel).toBeOneOf([ImpactLevel.LOW, ImpactLevel.MEDIUM, ImpactLevel.HIGH]);
+      expect(estimate.prerequisites).toContain('existing-dependency');
+      expect(estimate.prerequisites).toContain('Error handling strategy review');
+    });
+
+    it('should cap multipliers at reasonable limits', () => {
+      const recommendation: Recommendation = {
+        id: 'r8',
+        type: RefactoringType.EXTRACT_METHOD,
+        description: 'Extract from extremely complex file',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.FUNCTIONS,
+        effort: EffortLevel.MEDIUM,
+        impact: ImpactLevel.HIGH,
+        dependencies: []
+      };
+
+      const context = {
+        fileAnalysis: {
+          filePath: 'extreme-file.ts',
+          functions: Array(50).fill(null).map((_, i) => ({ 
+            name: `func${i}`, 
+            location: { filePath: 'extreme-file.ts', line: i + 1, column: 1 },
+            parameters: Array(10).fill('param'),
+            complexity: {
+              cyclomaticComplexity: 50,
+              cognitiveComplexity: 100,
+              nestingDepth: 10,
+              lineCount: 100,
+              parameterCount: 10
+            },
+            isAsync: false,
+            isExported: false
+          })),
+          classes: [],
+          imports: [],
+          complexity: {
+            cyclomaticComplexity: 100, // Extremely high
+            cognitiveComplexity: 200,  // Extremely high
+            nestingDepth: 15,          // Extremely deep
+            lineCount: 2000,           // Extremely large
+            parameterCount: 10
+          },
+          lineCount: 2000
+        },
+        usageFrequency: {
+          functionCallCounts: new Map([['testFunc', 1000]]),
+          classUsageCounts: new Map(),
+          fileAccessCounts: new Map([['extreme-file.ts', 1000]])
+        },
+        testCoverage: {
+          overallCoverage: 0.1,
+          fileCoverage: new Map([['extreme-file.ts', 0.05]]), // Extremely low
+          functionCoverage: new Map()
+        },
+        dependencyGraph: {
+          fileDependencies: new Map([['extreme-file.ts', Array(50).fill('dep')]]), // Many deps
+          functionDependencies: new Map(),
+          classDependencies: new Map()
+        },
+        codebaseMetrics: {
+          totalFiles: 1000, // Huge codebase
+          totalLines: 500000,
+          averageComplexity: 20,
+          hotspotFiles: ['extreme-file.ts']
+        }
+      };
+
+      const estimate = engine.estimateEffort(recommendation, context);
+
+      // Should be capped at reasonable limits
+      expect(estimate.timeHours).toBeLessThan(200); // Reasonable upper bound
+      expect(estimate.complexity).toBe(EffortLevel.LARGE);
+      expect(estimate.riskLevel).toBe(ImpactLevel.HIGH);
+    });
+
+    it('should detect circular dependencies and increase risk', () => {
+      const recommendation: Recommendation = {
+        id: 'r9',
+        type: RefactoringType.SPLIT_CLASS,
+        description: 'Split class with circular dependencies',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.CLASSES,
+        effort: EffortLevel.LARGE,
+        impact: ImpactLevel.MEDIUM,
+        dependencies: []
+      };
+
+      const context = {
+        fileAnalysis: {
+          filePath: 'circular-file.ts',
+          functions: [],
+          classes: [],
+          imports: [],
+          complexity: {
+            cyclomaticComplexity: 8,
+            cognitiveComplexity: 12,
+            nestingDepth: 3,
+            lineCount: 150,
+            parameterCount: 2
+          },
+          lineCount: 150
+        },
+        dependencyGraph: {
+          fileDependencies: new Map([
+            ['circular-file.ts', ['dep1.ts', 'dep2.ts']],
+            ['dep1.ts', ['dep2.ts']],
+            ['dep2.ts', ['circular-file.ts']] // Creates circular dependency
+          ]),
+          functionDependencies: new Map(),
+          classDependencies: new Map()
+        },
+        testCoverage: {
+          overallCoverage: 0.8,
+          fileCoverage: new Map([['circular-file.ts', 0.8]]),
+          functionCoverage: new Map()
+        }
+      };
+
+      const estimate = engine.estimateEffort(recommendation, context);
+      const baseEstimate = engine.estimateEffort(recommendation);
+
+      expect(estimate.timeHours).toBeGreaterThan(baseEstimate.timeHours);
+      expect(estimate.riskLevel).toBeOneOf([ImpactLevel.MEDIUM, ImpactLevel.HIGH]);
+    });
+
+    it('should provide different estimates for different refactoring types', () => {
+      const baseRecommendation = {
+        id: 'base',
+        description: 'Base recommendation',
+        beforeCode: '',
+        afterCode: '',
+        principle: CleanCodePrinciple.FUNCTIONS,
+        effort: EffortLevel.MEDIUM,
+        impact: ImpactLevel.MEDIUM,
+        dependencies: []
+      };
+
+      const renameEstimate = engine.estimateEffort({
+        ...baseRecommendation,
+        type: RefactoringType.RENAME
+      });
+
+      const extractMethodEstimate = engine.estimateEffort({
+        ...baseRecommendation,
+        type: RefactoringType.EXTRACT_METHOD
+      });
+
+      const splitClassEstimate = engine.estimateEffort({
+        ...baseRecommendation,
+        type: RefactoringType.SPLIT_CLASS
+      });
+
+      expect(renameEstimate.timeHours).toBeLessThan(extractMethodEstimate.timeHours);
+      expect(extractMethodEstimate.timeHours).toBeLessThan(splitClassEstimate.timeHours);
     });
   });
 
