@@ -154,3 +154,88 @@ export interface TrendDataPoint {
   quality: number;
   violations: number;
 }
+
+// Improvement tracking interfaces
+export interface ImprovementMetrics {
+  id: string;
+  timestamp: Date;
+  baselineId: string;
+  comparisonId: string;
+  timeInvested: number; // hours
+  qualityImprovement: number; // percentage
+  complexityReduction: number; // percentage
+  violationsFixed: number;
+  filesImproved: number;
+  contributor?: string;
+}
+
+export interface ROICalculation {
+  improvementId: string;
+  timeInvested: number; // hours
+  qualityGain: number; // percentage
+  complexityReduction: number; // percentage
+  estimatedMaintenanceTimeSaved: number; // hours
+  roi: number; // return on investment ratio
+  paybackPeriod: number; // months
+}
+
+export interface TeamPerformanceMetrics {
+  teamId: string;
+  period: DateRange;
+  contributors: ContributorMetrics[];
+  teamAverageQuality: number;
+  teamAverageComplexity: number;
+  totalImprovements: number;
+  totalTimeInvested: number;
+  teamROI: number;
+}
+
+export interface ContributorMetrics {
+  contributorId: string;
+  name: string;
+  improvementsCount: number;
+  averageQualityImprovement: number;
+  averageComplexityReduction: number;
+  totalTimeInvested: number;
+  individualROI: number;
+  filesImproved: number;
+}
+
+export interface ProgressVisualizationData {
+  timeSeriesData: TimeSeriesPoint[];
+  improvementHeatmap: ImprovementHeatmapData[];
+  roiTrends: ROITrendData[];
+  teamComparison: TeamComparisonData[];
+}
+
+export interface TimeSeriesPoint {
+  timestamp: Date;
+  qualityScore: number;
+  complexityScore: number;
+  violationCount: number;
+  improvementCount: number;
+}
+
+export interface ImprovementHeatmapData {
+  filePath: string;
+  improvementCount: number;
+  qualityGain: number;
+  lastImprovement: Date;
+  contributor: string;
+}
+
+export interface ROITrendData {
+  period: string;
+  averageROI: number;
+  totalTimeInvested: number;
+  totalQualityGain: number;
+  improvementCount: number;
+}
+
+export interface TeamComparisonData {
+  contributorId: string;
+  name: string;
+  qualityScore: number;
+  improvementRate: number;
+  roi: number;
+}

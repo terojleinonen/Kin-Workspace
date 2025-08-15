@@ -14,7 +14,16 @@ import {
   Trend,
   TrendDataPoint,
   DateRange,
-  CleanCodePrinciple
+  CleanCodePrinciple,
+  ImprovementMetrics,
+  ROICalculation,
+  TeamPerformanceMetrics,
+  ContributorMetrics,
+  ProgressVisualizationData,
+  TimeSeriesPoint,
+  ImprovementHeatmapData,
+  ROITrendData,
+  TeamComparisonData
 } from '../types';
 import { BatchAnalysis, FileAnalysis } from './file-parser';
 import { QualityReport, CleanCodeAssessor } from './quality-assessor';
@@ -25,6 +34,10 @@ export interface ProgressTracker {
   calculateTrends(startDate: Date, endDate: Date): Promise<TrendReport>;
   getBaselineHistory(): Promise<Baseline[]>;
   getLatestBaseline(): Promise<Baseline | null>;
+  trackImprovement(baselineId: string, comparisonId: string, timeInvested: number, contributor?: string): Promise<ImprovementMetrics>;
+  calculateROI(improvementId: string): Promise<ROICalculation>;
+  getTeamPerformance(teamId: string, period: DateRange): Promise<TeamPerformanceMetrics>;
+  getProgressVisualizationData(period: DateRange): Promise<ProgressVisualizationData>;
 }
 
 /**
@@ -33,11 +46,15 @@ export interface ProgressTracker {
 export class CleanCodeProgressTracker implements ProgressTracker {
   private readonly storageDir: string;
   private readonly baselinesDir: string;
+  private readonly improvementsDir: string;
+  private readonly teamDataDir: string;
   private readonly qualityAssessor: CleanCodeAssessor;
 
   constructor(storageDir: string = './progress-data') {
     this.storageDir = storageDir;
     this.baselinesDir = path.join(storageDir, 'baselines');
+    this.improvementsDir = path.join(storageDir, 'improvements');
+    this.teamDataDir = path.join(storageDir, 'team-data');
     this.qualityAssessor = new CleanCodeAssessor();
     
     // Ensure storage directories exist
@@ -176,6 +193,291 @@ export class CleanCodeProgressTracker implements ProgressTracker {
     return history.length > 0 ? history[history.length - 1] : null;
   }
 
+  async trackImprovement(baselineId: string, comparisonId: string, timeInvested: number, contributor?: string): Promise<ImprovementMetrics> {
+    const comparison = await this.compareBaselines(baselineId, comparisonId);
+    const baseline = await this.loadBaseline(baselineId);
+    const comparisonBaseline = await this.loadBaseline(comparisonId);
+    
+    if (!baseline || !comparisonBaseline) {
+      throw new Error('Baseline not found for improvement tracking');
+    }
+    
+    const id = this.generateImprovementId();
+    const timestamp = new Date();
+    
+    // Calculate files improved (files with positive quality change)
+    const filesImproved = comparison.fileComparisons.filter(fc => fc.qualityChange > 0).length;
+    
+    // Calculate violations fixed (negative violation change means violations were fixed)
+    const violationsFixed = comparison.fileComparisons.reduce((sum, fc) => 
+      sum + Math.max(0, -fc.violationChange), 0
+    );
+    
+    const improvement: ImprovementMetrics = {
+      id,
+      timestamp,
+      baselineId,
+      comparisonId,
+      timeInvested,
+      qualityImprovement: comparison.qualityImprovement,
+      complexityReduction: comparison.complexityImprovement,
+      violationsFixed,
+      filesImproved,
+      contributor
+    };
+    
+    // Save improvement record
+    await this.saveImprovement(improvement);
+    
+    return improvement;
+  }
+
+  async calculateROI(improvementId: string): Promise<ROICalculation> {
+    const improvement = await this.loadImprovement(improvementId);
+    if (!improvement) {
+      throw new Error(`Improvement not found: ${improvementId}`);
+    }
+    
+    // ROI calculation based on quality gains and time invested
+    // Assumptions for maintenance time savings:
+    // - 1% quality improvement = 0.5 hours saved per month per file
+    // - 1% complexity reduction = 0.3 hours saved per month per file
+    const qualityTimeSavings = (improvement.qualityImprovement / 100) * improvement.filesImproved * 0.5;
+    const complexityTimeSavings = (improvement.complexityReduction / 100) * improvement.filesImproved * 0.3;
+    const estimatedMaintenanceTimeSaved = (qualityTimeSavings + complexityTimeSavings) * 12; // Annual savings
+    
+    // ROI = (Gain - Investment) / Investment
+    const roi = improvement.timeInvested > 0 ? 
+      (estimatedMaintenanceTimeSaved - improvement.timeInvested) / improvement.timeInvested : 0;
+    
+    // Payback period in months
+    const monthlyTimeSavings = (qualityTimeSavings + complexityTimeSavings);
+    const paybackPeriod = monthlyTimeSavings > 0 ? improvement.timeInvested / monthlyTimeSavings : 0;
+    
+    const roiCalculation: ROICalculation = {
+      improvementId,
+      timeInvested: improvement.timeInvested,
+      qualityGain: improvement.qualityImprovement,
+      complexityReduction: improvement.complexityReduction,
+      estimatedMaintenanceTimeSaved,
+      roi,
+      paybackPeriod
+    };
+    
+    return roiCalculation;
+  }
+
+  async getTeamPerformance(teamId: string, period: DateRange): Promise<TeamPerformanceMetrics> {
+    const improvements = await this.getImprovementsInPeriod(period);
+    const baselines = await this.getBaselinesInRange(period.start, period.end);
+    
+    // Group improvements by contributor
+    const contributorMap = new Map<string, ImprovementMetrics[]>();
+    
+    for (const improvement of improvements) {
+      if (improvement.contributor) {
+        const existing = contributorMap.get(improvement.contributor) || [];
+        existing.push(improvement);
+        contributorMap.set(improvement.contributor, existing);
+      }
+    }
+    
+    // Calculate contributor metrics
+    const contributors: ContributorMetrics[] = [];
+    
+    for (const [contributorId, contributorImprovements] of contributorMap) {
+      const improvementsCount = contributorImprovements.length;
+      const averageQualityImprovement = contributorImprovements.reduce((sum, imp) => 
+        sum + imp.qualityImprovement, 0) / improvementsCount;
+      const averageComplexityReduction = contributorImprovements.reduce((sum, imp) => 
+        sum + imp.complexityReduction, 0) / improvementsCount;
+      const totalTimeInvested = contributorImprovements.reduce((sum, imp) => 
+        sum + imp.timeInvested, 0);
+      const filesImproved = contributorImprovements.reduce((sum, imp) => 
+        sum + imp.filesImproved, 0);
+      
+      // Calculate individual ROI
+      const totalQualityGain = contributorImprovements.reduce((sum, imp) => 
+        sum + (imp.qualityImprovement / 100) * imp.filesImproved * 0.5, 0);
+      const totalComplexityGain = contributorImprovements.reduce((sum, imp) => 
+        sum + (imp.complexityReduction / 100) * imp.filesImproved * 0.3, 0);
+      const estimatedAnnualSavings = (totalQualityGain + totalComplexityGain) * 12;
+      const individualROI = totalTimeInvested > 0 ? 
+        (estimatedAnnualSavings - totalTimeInvested) / totalTimeInvested : 0;
+      
+      contributors.push({
+        contributorId,
+        name: contributorId, // In a real system, this would be looked up from user data
+        improvementsCount,
+        averageQualityImprovement,
+        averageComplexityReduction,
+        totalTimeInvested,
+        individualROI,
+        filesImproved
+      });
+    }
+    
+    // Calculate team averages
+    const teamAverageQuality = baselines.length > 0 ? 
+      baselines.reduce((sum, b) => sum + b.overallMetrics.qualityScore, 0) / baselines.length : 0;
+    const teamAverageComplexity = baselines.length > 0 ? 
+      baselines.reduce((sum, b) => sum + b.overallMetrics.averageComplexity, 0) / baselines.length : 0;
+    
+    const totalImprovements = improvements.length;
+    const totalTimeInvested = improvements.reduce((sum, imp) => sum + imp.timeInvested, 0);
+    
+    // Calculate team ROI
+    const teamQualityGain = improvements.reduce((sum, imp) => 
+      sum + (imp.qualityImprovement / 100) * imp.filesImproved * 0.5, 0);
+    const teamComplexityGain = improvements.reduce((sum, imp) => 
+      sum + (imp.complexityReduction / 100) * imp.filesImproved * 0.3, 0);
+    const teamEstimatedAnnualSavings = (teamQualityGain + teamComplexityGain) * 12;
+    const teamROI = totalTimeInvested > 0 ? 
+      (teamEstimatedAnnualSavings - totalTimeInvested) / totalTimeInvested : 0;
+    
+    return {
+      teamId,
+      period,
+      contributors,
+      teamAverageQuality,
+      teamAverageComplexity,
+      totalImprovements,
+      totalTimeInvested,
+      teamROI
+    };
+  }
+
+  async getProgressVisualizationData(period: DateRange): Promise<ProgressVisualizationData> {
+    const baselines = await this.getBaselinesInRange(period.start, period.end);
+    const improvements = await this.getImprovementsInPeriod(period);
+    
+    // Create time series data
+    const timeSeriesData: TimeSeriesPoint[] = baselines.map(baseline => ({
+      timestamp: baseline.timestamp,
+      qualityScore: baseline.overallMetrics.qualityScore,
+      complexityScore: baseline.overallMetrics.averageComplexity,
+      violationCount: baseline.overallMetrics.totalViolations,
+      improvementCount: improvements.filter(imp => 
+        imp.timestamp.getTime() <= baseline.timestamp.getTime()).length
+    }));
+    
+    // Create improvement heatmap data
+    const fileImprovementMap = new Map<string, { count: number; totalGain: number; lastImprovement: Date; contributor: string }>();
+    
+    for (const improvement of improvements) {
+      const comparison = await this.compareBaselines(improvement.baselineId, improvement.comparisonId);
+      
+      for (const fileComparison of comparison.fileComparisons) {
+        if (fileComparison.qualityChange > 0) {
+          const existing = fileImprovementMap.get(fileComparison.filePath) || 
+            { count: 0, totalGain: 0, lastImprovement: new Date(0), contributor: '' };
+          
+          existing.count++;
+          existing.totalGain += fileComparison.qualityChange;
+          if (improvement.timestamp > existing.lastImprovement) {
+            existing.lastImprovement = improvement.timestamp;
+            existing.contributor = improvement.contributor || 'Unknown';
+          }
+          
+          fileImprovementMap.set(fileComparison.filePath, existing);
+        }
+      }
+    }
+    
+    const improvementHeatmap: ImprovementHeatmapData[] = Array.from(fileImprovementMap.entries())
+      .map(([filePath, data]) => ({
+        filePath,
+        improvementCount: data.count,
+        qualityGain: data.totalGain,
+        lastImprovement: data.lastImprovement,
+        contributor: data.contributor
+      }));
+    
+    // Create ROI trends (monthly aggregation)
+    const roiTrends: ROITrendData[] = [];
+    const monthlyData = new Map<string, { improvements: ImprovementMetrics[]; rois: ROICalculation[] }>();
+    
+    for (const improvement of improvements) {
+      const monthKey = `${improvement.timestamp.getFullYear()}-${improvement.timestamp.getMonth() + 1}`;
+      const existing = monthlyData.get(monthKey) || { improvements: [], rois: [] };
+      existing.improvements.push(improvement);
+      monthlyData.set(monthKey, existing);
+    }
+    
+    for (const [period, data] of monthlyData) {
+      const totalTimeInvested = data.improvements.reduce((sum, imp) => sum + imp.timeInvested, 0);
+      const totalQualityGain = data.improvements.reduce((sum, imp) => sum + imp.qualityImprovement, 0);
+      const improvementCount = data.improvements.length;
+      
+      // Calculate average ROI for the period
+      let totalROI = 0;
+      for (const improvement of data.improvements) {
+        try {
+          const roi = await this.calculateROI(improvement.id);
+          totalROI += roi.roi;
+        } catch (error) {
+          // Skip if ROI calculation fails
+        }
+      }
+      const averageROI = improvementCount > 0 ? totalROI / improvementCount : 0;
+      
+      roiTrends.push({
+        period,
+        averageROI,
+        totalTimeInvested,
+        totalQualityGain,
+        improvementCount
+      });
+    }
+    
+    // Create team comparison data
+    const contributorMap = new Map<string, ImprovementMetrics[]>();
+    for (const improvement of improvements) {
+      if (improvement.contributor) {
+        const existing = contributorMap.get(improvement.contributor) || [];
+        existing.push(improvement);
+        contributorMap.set(improvement.contributor, existing);
+      }
+    }
+    
+    const teamComparison: TeamComparisonData[] = [];
+    for (const [contributorId, contributorImprovements] of contributorMap) {
+      const qualityScore = contributorImprovements.reduce((sum, imp) => 
+        sum + imp.qualityImprovement, 0) / contributorImprovements.length;
+      const improvementRate = contributorImprovements.length / 
+        ((period.end.getTime() - period.start.getTime()) / (1000 * 60 * 60 * 24 * 30)); // per month
+      
+      // Calculate average ROI
+      let totalROI = 0;
+      let roiCount = 0;
+      for (const improvement of contributorImprovements) {
+        try {
+          const roi = await this.calculateROI(improvement.id);
+          totalROI += roi.roi;
+          roiCount++;
+        } catch (error) {
+          // Skip if ROI calculation fails
+        }
+      }
+      const averageROI = roiCount > 0 ? totalROI / roiCount : 0;
+      
+      teamComparison.push({
+        contributorId,
+        name: contributorId,
+        qualityScore,
+        improvementRate,
+        roi: averageROI
+      });
+    }
+    
+    return {
+      timeSeriesData,
+      improvementHeatmap,
+      roiTrends,
+      teamComparison
+    };
+  }
+
   private generateBaselineId(): string {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const random = Math.random().toString(36).substring(2, 8);
@@ -189,6 +491,14 @@ export class CleanCodeProgressTracker implements ProgressTracker {
     
     if (!fs.existsSync(this.baselinesDir)) {
       fs.mkdirSync(this.baselinesDir, { recursive: true });
+    }
+    
+    if (!fs.existsSync(this.improvementsDir)) {
+      fs.mkdirSync(this.improvementsDir, { recursive: true });
+    }
+    
+    if (!fs.existsSync(this.teamDataDir)) {
+      fs.mkdirSync(this.teamDataDir, { recursive: true });
     }
   }
 
@@ -456,5 +766,68 @@ export class CleanCodeProgressTracker implements ProgressTracker {
       rate: trend.rate,
       confidence: trend.confidence
     };
+  }
+
+  private generateImprovementId(): string {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const random = Math.random().toString(36).substring(2, 8);
+    return `improvement-${timestamp}-${random}`;
+  }
+
+  private async saveImprovement(improvement: ImprovementMetrics): Promise<void> {
+    const filePath = path.join(this.improvementsDir, `${improvement.id}.json`);
+    
+    const serializable = {
+      ...improvement,
+      timestamp: improvement.timestamp.toISOString()
+    };
+    
+    fs.writeFileSync(filePath, JSON.stringify(serializable, null, 2));
+  }
+
+  private async loadImprovement(id: string): Promise<ImprovementMetrics | null> {
+    const filePath = path.join(this.improvementsDir, `${id}.json`);
+    
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+    
+    try {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      
+      return {
+        ...data,
+        timestamp: new Date(data.timestamp)
+      };
+    } catch (error) {
+      console.error(`Failed to load improvement ${id}:`, error);
+      return null;
+    }
+  }
+
+  private async getImprovementsInPeriod(period: DateRange): Promise<ImprovementMetrics[]> {
+    if (!fs.existsSync(this.improvementsDir)) {
+      return [];
+    }
+    
+    const files = fs.readdirSync(this.improvementsDir)
+      .filter(file => file.endsWith('.json'));
+    
+    const improvements: ImprovementMetrics[] = [];
+    
+    for (const file of files) {
+      try {
+        const improvement = await this.loadImprovement(path.basename(file, '.json'));
+        if (improvement && 
+            improvement.timestamp >= period.start && 
+            improvement.timestamp <= period.end) {
+          improvements.push(improvement);
+        }
+      } catch (error) {
+        console.warn(`Failed to load improvement ${file}:`, error);
+      }
+    }
+    
+    return improvements.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   }
 }

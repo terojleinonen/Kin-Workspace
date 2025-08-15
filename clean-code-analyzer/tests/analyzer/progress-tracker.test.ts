@@ -257,6 +257,299 @@ describe('ProgressTracker', () => {
       expect(result).toBeNull();
     });
   });
+
+  // Additional tests for improvement tracking functionality
+  describe('Improvement Tracking', () => {
+    describe('trackImprovement', () => {
+      it('should track improvement between two baselines', async () => {
+        // Arrange
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        const timeInvested = 4.5; // hours
+        const contributor = 'john.doe';
+
+        // Act
+        const improvement = await progressTracker.trackImprovement(
+          baseline1.id, 
+          baseline2.id, 
+          timeInvested, 
+          contributor
+        );
+
+        // Assert
+        expect(improvement).toBeDefined();
+        expect(improvement.id).toBeDefined();
+        expect(improvement.timestamp).toBeInstanceOf(Date);
+        expect(improvement.baselineId).toBe(baseline1.id);
+        expect(improvement.comparisonId).toBe(baseline2.id);
+        expect(improvement.timeInvested).toBe(timeInvested);
+        expect(improvement.contributor).toBe(contributor);
+        expect(improvement.qualityImprovement).toBeGreaterThan(0);
+        expect(improvement.complexityReduction).toBeGreaterThan(0);
+        expect(improvement.filesImproved).toBeGreaterThan(0);
+        expect(improvement.violationsFixed).toBeGreaterThanOrEqual(0);
+      });
+
+      it('should save improvement to storage', async () => {
+        // Arrange
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+
+        // Act
+        const improvement = await progressTracker.trackImprovement(baseline1.id, baseline2.id, 2.0);
+
+        // Assert
+        const improvementFile = path.join(tempDir, 'improvements', `${improvement.id}.json`);
+        expect(fs.existsSync(improvementFile)).toBe(true);
+        
+        const savedImprovement = JSON.parse(fs.readFileSync(improvementFile, 'utf-8'));
+        expect(savedImprovement.id).toBe(improvement.id);
+        expect(savedImprovement.timeInvested).toBe(2.0);
+      });
+
+      it('should handle improvement tracking without contributor', async () => {
+        // Arrange
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+
+        // Act
+        const improvement = await progressTracker.trackImprovement(baseline1.id, baseline2.id, 1.5);
+
+        // Assert
+        expect(improvement.contributor).toBeUndefined();
+        expect(improvement.timeInvested).toBe(1.5);
+      });
+
+      it('should throw error for non-existent baselines', async () => {
+        // Act & Assert
+        await expect(progressTracker.trackImprovement('non-existent-1', 'non-existent-2', 1.0))
+          .rejects.toThrow('Baseline not found');
+      });
+    });
+
+    describe('calculateROI', () => {
+      it('should calculate ROI for an improvement', async () => {
+        // Arrange
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        const improvement = await progressTracker.trackImprovement(baseline1.id, baseline2.id, 4.0);
+
+        // Act
+        const roi = await progressTracker.calculateROI(improvement.id);
+
+        // Assert
+        expect(roi).toBeDefined();
+        expect(roi.improvementId).toBe(improvement.id);
+        expect(roi.timeInvested).toBe(4.0);
+        expect(roi.qualityGain).toBeGreaterThan(0);
+        expect(roi.complexityReduction).toBeGreaterThan(0);
+        expect(roi.estimatedMaintenanceTimeSaved).toBeGreaterThan(0);
+        expect(roi.roi).toBeDefined();
+        expect(roi.paybackPeriod).toBeGreaterThan(0);
+      });
+
+      it('should calculate positive ROI for significant improvements', async () => {
+        // Arrange
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        const improvement = await progressTracker.trackImprovement(baseline1.id, baseline2.id, 2.0); // Small time investment
+
+        // Act
+        const roi = await progressTracker.calculateROI(improvement.id);
+
+        // Assert
+        expect(roi.roi).toBeGreaterThan(0); // Should have positive ROI
+        expect(roi.paybackPeriod).toBeLessThan(12); // Should pay back within a year
+      });
+
+      it('should handle zero time investment', async () => {
+        // Arrange
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        const improvement = await progressTracker.trackImprovement(baseline1.id, baseline2.id, 0);
+
+        // Act
+        const roi = await progressTracker.calculateROI(improvement.id);
+
+        // Assert
+        expect(roi.roi).toBe(0);
+        expect(roi.timeInvested).toBe(0);
+      });
+
+      it('should throw error for non-existent improvement', async () => {
+        // Act & Assert
+        await expect(progressTracker.calculateROI('non-existent-improvement'))
+          .rejects.toThrow('Improvement not found');
+      });
+    });
+
+    describe('getTeamPerformance', () => {
+      it('should calculate team performance metrics', async () => {
+        // Arrange
+        const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // Yesterday
+        const endDate = new Date(Date.now() + 24 * 60 * 60 * 1000); // Tomorrow
+        
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        
+        await progressTracker.trackImprovement(baseline1.id, baseline2.id, 3.0, 'alice');
+        await progressTracker.trackImprovement(baseline1.id, baseline2.id, 2.5, 'bob');
+
+        // Act
+        const teamPerformance = await progressTracker.getTeamPerformance('team-1', { start: startDate, end: endDate });
+
+        // Assert
+        expect(teamPerformance).toBeDefined();
+        expect(teamPerformance.teamId).toBe('team-1');
+        expect(teamPerformance.period.start).toEqual(startDate);
+        expect(teamPerformance.period.end).toEqual(endDate);
+        expect(teamPerformance.contributors).toHaveLength(2);
+        expect(teamPerformance.totalImprovements).toBe(2);
+        expect(teamPerformance.totalTimeInvested).toBe(5.5);
+        expect(teamPerformance.teamROI).toBeDefined();
+      });
+
+      it('should calculate individual contributor metrics', async () => {
+        // Arrange
+        const period = { start: new Date(Date.now() - 24 * 60 * 60 * 1000), end: new Date(Date.now() + 24 * 60 * 60 * 1000) };
+        
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        const baseline3 = await progressTracker.recordBaseline(createFurtherImprovedBatchAnalysis());
+        
+        await progressTracker.trackImprovement(baseline1.id, baseline2.id, 4.0, 'alice');
+        await progressTracker.trackImprovement(baseline2.id, baseline3.id, 2.0, 'alice');
+
+        // Act
+        const teamPerformance = await progressTracker.getTeamPerformance('team-1', period);
+
+        // Assert
+        const alice = teamPerformance.contributors.find((c: any) => c.contributorId === 'alice');
+        expect(alice).toBeDefined();
+        expect(alice!.improvementsCount).toBe(2);
+        expect(alice!.totalTimeInvested).toBe(6.0);
+        expect(alice!.averageQualityImprovement).toBeGreaterThan(0);
+        expect(alice!.individualROI).toBeDefined();
+      });
+
+      it('should handle empty team performance', async () => {
+        // Arrange
+        const period = { start: new Date('2024-01-01'), end: new Date('2024-01-31') };
+
+        // Act
+        const teamPerformance = await progressTracker.getTeamPerformance('empty-team', period);
+
+        // Assert
+        expect(teamPerformance.contributors).toHaveLength(0);
+        expect(teamPerformance.totalImprovements).toBe(0);
+        expect(teamPerformance.totalTimeInvested).toBe(0);
+      });
+    });
+
+    describe('getProgressVisualizationData', () => {
+      it('should generate comprehensive visualization data', async () => {
+        // Arrange
+        const period = { start: new Date(Date.now() - 24 * 60 * 60 * 1000), end: new Date(Date.now() + 24 * 60 * 60 * 1000) };
+        
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        await new Promise(resolve => setTimeout(resolve, 10));
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        await new Promise(resolve => setTimeout(resolve, 10));
+        const baseline3 = await progressTracker.recordBaseline(createFurtherImprovedBatchAnalysis());
+        
+        await progressTracker.trackImprovement(baseline1.id, baseline2.id, 3.0, 'alice');
+        await progressTracker.trackImprovement(baseline2.id, baseline3.id, 2.0, 'bob');
+
+        // Act
+        const vizData = await progressTracker.getProgressVisualizationData(period);
+
+        // Assert
+        expect(vizData).toBeDefined();
+        expect(vizData.timeSeriesData).toHaveLength(3);
+        expect(vizData.improvementHeatmap).toBeDefined();
+        expect(vizData.roiTrends).toBeDefined();
+        expect(vizData.teamComparison).toHaveLength(2);
+      });
+
+      it('should create time series data with correct structure', async () => {
+        // Arrange
+        const period = { start: new Date(Date.now() - 24 * 60 * 60 * 1000), end: new Date(Date.now() + 24 * 60 * 60 * 1000) };
+        const baseline = await progressTracker.recordBaseline(createMockBatchAnalysis());
+
+        // Act
+        const vizData = await progressTracker.getProgressVisualizationData(period);
+
+        // Assert
+        expect(vizData.timeSeriesData).toHaveLength(1);
+        const dataPoint = vizData.timeSeriesData[0];
+        expect(dataPoint.timestamp).toBeInstanceOf(Date);
+        expect(dataPoint.qualityScore).toBeDefined();
+        expect(dataPoint.complexityScore).toBeDefined();
+        expect(dataPoint.violationCount).toBeDefined();
+        expect(dataPoint.improvementCount).toBeDefined();
+      });
+
+      it('should generate improvement heatmap data', async () => {
+        // Arrange
+        const period = { start: new Date(Date.now() - 24 * 60 * 60 * 1000), end: new Date(Date.now() + 24 * 60 * 60 * 1000) };
+        
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        
+        await progressTracker.trackImprovement(baseline1.id, baseline2.id, 2.0, 'alice');
+
+        // Act
+        const vizData = await progressTracker.getProgressVisualizationData(period);
+
+        // Assert
+        expect(vizData.improvementHeatmap.length).toBeGreaterThan(0);
+        const heatmapItem = vizData.improvementHeatmap[0];
+        expect(heatmapItem.filePath).toBeDefined();
+        expect(heatmapItem.improvementCount).toBeGreaterThan(0);
+        expect(heatmapItem.qualityGain).toBeGreaterThan(0);
+        expect(heatmapItem.lastImprovement).toBeInstanceOf(Date);
+        expect(heatmapItem.contributor).toBe('alice');
+      });
+
+      it('should generate team comparison data', async () => {
+        // Arrange
+        const period = { start: new Date(Date.now() - 24 * 60 * 60 * 1000), end: new Date(Date.now() + 24 * 60 * 60 * 1000) };
+        
+        const baseline1 = await progressTracker.recordBaseline(createMockBatchAnalysis());
+        const baseline2 = await progressTracker.recordBaseline(createImprovedBatchAnalysis());
+        
+        await progressTracker.trackImprovement(baseline1.id, baseline2.id, 3.0, 'alice');
+        await progressTracker.trackImprovement(baseline1.id, baseline2.id, 4.0, 'bob');
+
+        // Act
+        const vizData = await progressTracker.getProgressVisualizationData(period);
+
+        // Assert
+        expect(vizData.teamComparison).toHaveLength(2);
+        const aliceData = vizData.teamComparison.find((tc: any) => tc.contributorId === 'alice');
+        const bobData = vizData.teamComparison.find((tc: any) => tc.contributorId === 'bob');
+        
+        expect(aliceData).toBeDefined();
+        expect(bobData).toBeDefined();
+        expect(aliceData!.qualityScore).toBeGreaterThan(0);
+        expect(bobData!.qualityScore).toBeGreaterThan(0);
+      });
+
+      it('should handle empty visualization data', async () => {
+        // Arrange
+        const period = { start: new Date('2024-01-01'), end: new Date('2024-01-31') };
+
+        // Act
+        const vizData = await progressTracker.getProgressVisualizationData(period);
+
+        // Assert
+        expect(vizData.timeSeriesData).toHaveLength(0);
+        expect(vizData.improvementHeatmap).toHaveLength(0);
+        expect(vizData.roiTrends).toHaveLength(0);
+        expect(vizData.teamComparison).toHaveLength(0);
+      });
+    });
+  });
 });
 
 // Helper functions to create mock data
@@ -385,3 +678,4 @@ function createFurtherImprovedBatchAnalysis(): BatchAnalysis {
   
   return batch;
 }
+
