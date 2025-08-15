@@ -6,8 +6,21 @@
  */
 
 export * from './analyzer';
-export * from './types';
 export * from './utils';
+export * from './cli';
+
+// Re-export specific types to avoid conflicts
+export {
+  CleanCodePrinciple,
+  Severity,
+  EffortLevel,
+  ImpactLevel,
+  RefactoringType,
+  CodeLocation,
+  ComplexityMetrics,
+  Violation,
+  Recommendation
+} from './types';
 
 // Version information
 export const VERSION = '1.0.0';
