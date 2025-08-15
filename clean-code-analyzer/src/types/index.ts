@@ -89,3 +89,68 @@ export interface Recommendation {
   impact: ImpactLevel;
   dependencies: string[];
 }
+
+// Progress tracking interfaces
+export interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+export interface Baseline {
+  id: string;
+  timestamp: Date;
+  projectName: string;
+  totalFiles: number;
+  overallMetrics: BaselineMetrics;
+  fileMetrics: FileBaselineMetrics[];
+}
+
+export interface BaselineMetrics {
+  averageComplexity: number;
+  totalViolations: number;
+  qualityScore: number;
+  principleScores: Map<CleanCodePrinciple, number>;
+}
+
+export interface FileBaselineMetrics {
+  filePath: string;
+  complexity: ComplexityMetrics;
+  qualityScore: number;
+  violationCount: number;
+}
+
+export interface BaselineComparison {
+  baselineId: string;
+  comparisonId: string;
+  overallImprovement: number;
+  complexityImprovement: number;
+  qualityImprovement: number;
+  fileComparisons: FileComparison[];
+}
+
+export interface FileComparison {
+  filePath: string;
+  complexityChange: number;
+  qualityChange: number;
+  violationChange: number;
+}
+
+export interface TrendReport {
+  timeRange: DateRange;
+  complexityTrend: Trend;
+  qualityTrend: Trend;
+  dataPoints: TrendDataPoint[];
+}
+
+export interface Trend {
+  direction: 'improving' | 'declining' | 'stable';
+  rate: number;
+  confidence: number;
+}
+
+export interface TrendDataPoint {
+  timestamp: Date;
+  complexity: number;
+  quality: number;
+  violations: number;
+}
