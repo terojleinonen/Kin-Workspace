@@ -1,0 +1,207 @@
+{
+  "summary": {
+    "totalFiles": 3,
+    "averageQualityScore": 0.76,
+    "totalViolations": 33,
+    "qualityGrade": "C",
+    "principleScores": {
+      "naming": 0.17,
+      "functions": 0.9,
+      "classes": 1,
+      "comments": 1,
+      "error_handling": 0.97
+    },
+    "complexityMetrics": {
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting": 1
+      },
+      "maintainability": 8,
+      "testability": 6,
+      "readability": 7,
+      "lineCount": 0
+    }
+  },
+  "violationAnalysis": {
+    "totalViolations": 33,
+    "bySeverity": {
+      "critical": 0,
+      "high": 1,
+      "medium": 30,
+      "low": 2
+    },
+    "byPrinciple": {
+      "naming": 29,
+      "functions": 3,
+      "classes": 0,
+      "comments": 0,
+      "error_handling": 1,
+      "solid_principles": 0
+    },
+    "topViolations": [
+      {
+        "id": "descriptiveness-88-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"analyzer\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analyzer\"",
+        "location": {
+          "line": 88,
+          "column": 11
+        }
+      },
+      {
+        "id": "descriptiveness-116-24",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"violation\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"violation\"",
+        "location": {
+          "line": 116,
+          "column": 24
+        }
+      },
+      {
+        "id": "descriptiveness-140-38",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"index\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"index\"",
+        "location": {
+          "line": 140,
+          "column": 38
+        }
+      },
+      {
+        "id": "descriptiveness-117-13",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"type\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"type\"",
+        "location": {
+          "line": 117,
+          "column": 13
+        }
+      },
+      {
+        "id": "descriptiveness-150-12",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"error\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"error\"",
+        "location": {
+          "line": 150,
+          "column": 12
+        }
+      },
+      {
+        "id": "descriptiveness-21-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"analysis\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analysis\"",
+        "location": {
+          "line": 21,
+          "column": 11
+        }
+      },
+      {
+        "id": "descriptiveness-97-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"metrics\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"metrics\"",
+        "location": {
+          "line": 97,
+          "column": 11
+        }
+      },
+      {
+        "id": "descriptiveness-138-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"suggestions\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"suggestions\"",
+        "location": {
+          "line": 138,
+          "column": 11
+        }
+      },
+      {
+        "id": "descriptiveness-140-26",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"suggestion\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"suggestion\"",
+        "location": {
+          "line": 140,
+          "column": 26
+        }
+      },
+      {
+        "id": "descriptiveness-145-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"summary\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"summary\"",
+        "location": {
+          "line": 145,
+          "column": 11
+        }
+      }
+    ],
+    "criticalIssues": []
+  },
+  "generatedAt": "2025-08-15T18:33:53.051Z",
+  "files": [
+    {
+      "filePath": "/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/naming-analysis-demo.ts",
+      "overallScore": 0.78,
+      "metrics": {
+        "complexity": {
+          "cyclomatic": 1,
+          "cognitive": 1,
+          "nesting": 1
+        },
+        "maintainability": 8,
+        "testability": 6,
+        "readability": 7,
+        "lineCount": 0
+      },
+      "violationCount": 12
+    },
+    {
+      "filePath": "/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/quality-assessment-demo.ts",
+      "overallScore": 0.78,
+      "metrics": {
+        "complexity": {
+          "cyclomatic": 1,
+          "cognitive": 1,
+          "nesting": 1
+        },
+        "maintainability": 8,
+        "testability": 6,
+        "readability": 7,
+        "lineCount": 0
+      },
+      "violationCount": 9
+    },
+    {
+      "filePath": "/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/violation-detection-demo.ts",
+      "overallScore": 0.74,
+      "metrics": {
+        "complexity": {
+          "cyclomatic": 1,
+          "cognitive": 1,
+          "nesting": 1
+        },
+        "maintainability": 7,
+        "testability": 6,
+        "readability": 7,
+        "lineCount": 0
+      },
+      "violationCount": 12
+    }
+  ]
+}

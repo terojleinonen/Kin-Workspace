@@ -1,0 +1,731 @@
+{
+  "summary": {
+    "totalFiles": 3,
+    "averageQualityScore": 0.76,
+    "totalViolations": 33,
+    "qualityGrade": "C",
+    "principleScores": {
+      "naming": 0.17,
+      "functions": 0.9,
+      "classes": 1,
+      "comments": 1,
+      "error_handling": 0.97
+    },
+    "complexityMetrics": {
+      "complexity": {
+        "cyclomatic": 1,
+        "cognitive": 1,
+        "nesting": 1
+      },
+      "maintainability": 8,
+      "testability": 6,
+      "readability": 7,
+      "lineCount": 0
+    }
+  },
+  "fileReports": [
+    {
+      "filePath": "/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/naming-analysis-demo.ts",
+      "overallScore": 0.78,
+      "principleBreakdown": [
+        {
+          "principle": "classes",
+          "score": 10,
+          "maxScore": 10,
+          "percentage": 1,
+          "status": "excellent",
+          "violationCount": 0
+        },
+        {
+          "principle": "comments",
+          "score": 10,
+          "maxScore": 10,
+          "percentage": 1,
+          "status": "excellent",
+          "violationCount": 0
+        },
+        {
+          "principle": "error_handling",
+          "score": 10,
+          "maxScore": 10,
+          "percentage": 1,
+          "status": "excellent",
+          "violationCount": 0
+        },
+        {
+          "principle": "functions",
+          "score": 9,
+          "maxScore": 10,
+          "percentage": 0.9,
+          "status": "excellent",
+          "violationCount": 1
+        },
+        {
+          "principle": "naming",
+          "score": 2,
+          "maxScore": 10,
+          "percentage": 0.2,
+          "status": "poor",
+          "violationCount": 11
+        }
+      ],
+      "violations": [
+        {
+          "id": "descriptiveness-88-11",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"analyzer\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analyzer\"",
+          "location": {
+            "line": 88,
+            "column": 11
+          }
+        },
+        {
+          "id": "descriptiveness-97-11",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"metrics\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"metrics\"",
+          "location": {
+            "line": 97,
+            "column": 11
+          }
+        },
+        {
+          "id": "descriptiveness-116-24",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"violation\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"violation\"",
+          "location": {
+            "line": 116,
+            "column": 24
+          }
+        },
+        {
+          "id": "descriptiveness-117-13",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"type\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"type\"",
+          "location": {
+            "line": 117,
+            "column": 13
+          }
+        },
+        {
+          "id": "descriptiveness-124-47",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"type\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"type\"",
+          "location": {
+            "line": 124,
+            "column": 47
+          }
+        },
+        {
+          "id": "descriptiveness-126-42",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"violation\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"violation\"",
+          "location": {
+            "line": 126,
+            "column": 42
+          }
+        },
+        {
+          "id": "descriptiveness-138-11",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"suggestions\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"suggestions\"",
+          "location": {
+            "line": 138,
+            "column": 11
+          }
+        },
+        {
+          "id": "descriptiveness-140-26",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"suggestion\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"suggestion\"",
+          "location": {
+            "line": 140,
+            "column": 26
+          }
+        },
+        {
+          "id": "descriptiveness-140-38",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"index\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"index\"",
+          "location": {
+            "line": 140,
+            "column": 38
+          }
+        },
+        {
+          "id": "descriptiveness-145-11",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"summary\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"summary\"",
+          "location": {
+            "line": 145,
+            "column": 11
+          }
+        },
+        {
+          "id": "descriptiveness-150-12",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"error\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"error\"",
+          "location": {
+            "line": 150,
+            "column": 12
+          }
+        },
+        {
+          "id": "long-function-77",
+          "principle": "functions",
+          "severity": "medium",
+          "description": "Function \"runNamingAnalysisDemo\" is too long (82 lines)",
+          "suggestion": "Break down function \"runNamingAnalysisDemo\" into smaller functions (max 20 lines)",
+          "location": {
+            "line": 77,
+            "column": 1
+          }
+        }
+      ],
+      "metrics": {
+        "complexity": {
+          "cyclomatic": 1,
+          "cognitive": 1,
+          "nesting": 1
+        },
+        "maintainability": 8,
+        "testability": 6,
+        "readability": 7,
+        "lineCount": 0
+      },
+      "recommendations": [
+        "Break down large functions and reduce complexity",
+        "Improve variable and function naming for better clarity"
+      ]
+    },
+    {
+      "filePath": "/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/quality-assessment-demo.ts",
+      "overallScore": 0.78,
+      "principleBreakdown": [
+        {
+          "principle": "classes",
+          "score": 10,
+          "maxScore": 10,
+          "percentage": 1,
+          "status": "excellent",
+          "violationCount": 0
+        },
+        {
+          "principle": "comments",
+          "score": 10,
+          "maxScore": 10,
+          "percentage": 1,
+          "status": "excellent",
+          "violationCount": 0
+        },
+        {
+          "principle": "error_handling",
+          "score": 10,
+          "maxScore": 10,
+          "percentage": 1,
+          "status": "excellent",
+          "violationCount": 0
+        },
+        {
+          "principle": "functions",
+          "score": 9,
+          "maxScore": 10,
+          "percentage": 0.9,
+          "status": "excellent",
+          "violationCount": 1
+        },
+        {
+          "principle": "naming",
+          "score": 2,
+          "maxScore": 10,
+          "percentage": 0.2,
+          "status": "poor",
+          "violationCount": 8
+        }
+      ],
+      "violations": [
+        {
+          "id": "descriptiveness-10-9",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"analyzer\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analyzer\"",
+          "location": {
+            "line": 10,
+            "column": 9
+          }
+        },
+        {
+          "id": "descriptiveness-11-9",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"assessor\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"assessor\"",
+          "location": {
+            "line": 11,
+            "column": 9
+          }
+        },
+        {
+          "id": "descriptiveness-21-11",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"analysis\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analysis\"",
+          "location": {
+            "line": 21,
+            "column": 11
+          }
+        },
+        {
+          "id": "descriptiveness-39-13",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"percentage\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"percentage\"",
+          "location": {
+            "line": 39,
+            "column": 13
+          }
+        },
+        {
+          "id": "descriptiveness-47-53",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"violation\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"violation\"",
+          "location": {
+            "line": 47,
+            "column": 53
+          }
+        },
+        {
+          "id": "descriptiveness-47-64",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"index\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"index\"",
+          "location": {
+            "line": 47,
+            "column": 64
+          }
+        },
+        {
+          "id": "descriptiveness-58-39",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"strength\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"strength\"",
+          "location": {
+            "line": 58,
+            "column": 39
+          }
+        },
+        {
+          "id": "descriptiveness-72-12",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"error\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"error\"",
+          "location": {
+            "line": 72,
+            "column": 12
+          }
+        },
+        {
+          "id": "long-function-9",
+          "principle": "functions",
+          "severity": "medium",
+          "description": "Function \"demonstrateQualityAssessment\" is too long (67 lines)",
+          "suggestion": "Break down function \"demonstrateQualityAssessment\" into smaller functions (max 20 lines)",
+          "location": {
+            "line": 9,
+            "column": 1
+          }
+        }
+      ],
+      "metrics": {
+        "complexity": {
+          "cyclomatic": 1,
+          "cognitive": 1,
+          "nesting": 1
+        },
+        "maintainability": 8,
+        "testability": 6,
+        "readability": 7,
+        "lineCount": 0
+      },
+      "recommendations": [
+        "Break down large functions and reduce complexity",
+        "Improve variable and function naming for better clarity"
+      ]
+    },
+    {
+      "filePath": "/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/violation-detection-demo.ts",
+      "overallScore": 0.74,
+      "principleBreakdown": [
+        {
+          "principle": "classes",
+          "score": 10,
+          "maxScore": 10,
+          "percentage": 1,
+          "status": "excellent",
+          "violationCount": 0
+        },
+        {
+          "principle": "comments",
+          "score": 10,
+          "maxScore": 10,
+          "percentage": 1,
+          "status": "excellent",
+          "violationCount": 0
+        },
+        {
+          "principle": "functions",
+          "score": 9,
+          "maxScore": 10,
+          "percentage": 0.9,
+          "status": "excellent",
+          "violationCount": 1
+        },
+        {
+          "principle": "error_handling",
+          "score": 9,
+          "maxScore": 10,
+          "percentage": 0.9,
+          "status": "excellent",
+          "violationCount": 1
+        },
+        {
+          "principle": "naming",
+          "score": 1,
+          "maxScore": 10,
+          "percentage": 0.1,
+          "status": "poor",
+          "violationCount": 10
+        }
+      ],
+      "violations": [
+        {
+          "id": "descriptiveness-94-9",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"analyzer\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analyzer\"",
+          "location": {
+            "line": 94,
+            "column": 9
+          }
+        },
+        {
+          "id": "descriptiveness-97-9",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"fs\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"fs\"",
+          "location": {
+            "line": 97,
+            "column": 9
+          }
+        },
+        {
+          "id": "searchability-97-9",
+          "principle": "naming",
+          "severity": "low",
+          "description": "Name \"fs\" has poor searchability",
+          "suggestion": "Use a more unique and searchable name instead of \"fs\"",
+          "location": {
+            "line": 97,
+            "column": 9
+          }
+        },
+        {
+          "id": "descriptiveness-102-11",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"analysis\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analysis\"",
+          "location": {
+            "line": 102,
+            "column": 11
+          }
+        },
+        {
+          "id": "descriptiveness-105-11",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"detector\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"detector\"",
+          "location": {
+            "line": 105,
+            "column": 11
+          }
+        },
+        {
+          "id": "descriptiveness-106-11",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"report\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"report\"",
+          "location": {
+            "line": 106,
+            "column": 11
+          }
+        },
+        {
+          "id": "descriptiveness-128-53",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"index\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"index\"",
+          "location": {
+            "line": 128,
+            "column": 53
+          }
+        },
+        {
+          "id": "single-letter-129-13",
+          "principle": "naming",
+          "severity": "high",
+          "description": "Single letter variable names should be avoided: \"v\"",
+          "suggestion": "Use a descriptive name that explains the purpose of \"v\"",
+          "location": {
+            "line": 129,
+            "column": 13
+          }
+        },
+        {
+          "id": "descriptiveness-129-13",
+          "principle": "naming",
+          "severity": "medium",
+          "description": "Name \"v\" is not descriptive enough",
+          "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"v\"",
+          "location": {
+            "line": 129,
+            "column": 13
+          }
+        },
+        {
+          "id": "searchability-129-13",
+          "principle": "naming",
+          "severity": "low",
+          "description": "Name \"v\" has poor searchability",
+          "suggestion": "Use a more unique and searchable name instead of \"v\"",
+          "location": {
+            "line": 129,
+            "column": 13
+          }
+        },
+        {
+          "id": "long-function-10",
+          "principle": "functions",
+          "severity": "medium",
+          "description": "Function \"demonstrateViolationDetection\" is too long (146 lines)",
+          "suggestion": "Break down function \"demonstrateViolationDetection\" into smaller functions (max 20 lines)",
+          "location": {
+            "line": 10,
+            "column": 1
+          }
+        },
+        {
+          "id": "missing-error-handling-10",
+          "principle": "error_handling",
+          "severity": "medium",
+          "description": "Function \"demonstrateViolationDetection\" may need error handling",
+          "suggestion": "Consider adding proper error handling to function \"demonstrateViolationDetection\"",
+          "location": {
+            "line": 10,
+            "column": 1
+          }
+        }
+      ],
+      "metrics": {
+        "complexity": {
+          "cyclomatic": 1,
+          "cognitive": 1,
+          "nesting": 1
+        },
+        "maintainability": 7,
+        "testability": 6,
+        "readability": 7,
+        "lineCount": 0
+      },
+      "recommendations": [
+        "Break down large functions and reduce complexity",
+        "Implement proper error handling and validation",
+        "Improve variable and function naming for better clarity"
+      ]
+    }
+  ],
+  "violationAnalysis": {
+    "totalViolations": 33,
+    "bySeverity": {
+      "critical": 0,
+      "high": 1,
+      "medium": 30,
+      "low": 2
+    },
+    "byPrinciple": {
+      "naming": 29,
+      "functions": 3,
+      "classes": 0,
+      "comments": 0,
+      "error_handling": 1,
+      "solid_principles": 0
+    },
+    "topViolations": [
+      {
+        "id": "descriptiveness-88-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"analyzer\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analyzer\"",
+        "location": {
+          "line": 88,
+          "column": 11
+        }
+      },
+      {
+        "id": "descriptiveness-116-24",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"violation\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"violation\"",
+        "location": {
+          "line": 116,
+          "column": 24
+        }
+      },
+      {
+        "id": "descriptiveness-140-38",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"index\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"index\"",
+        "location": {
+          "line": 140,
+          "column": 38
+        }
+      },
+      {
+        "id": "descriptiveness-117-13",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"type\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"type\"",
+        "location": {
+          "line": 117,
+          "column": 13
+        }
+      },
+      {
+        "id": "descriptiveness-150-12",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"error\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"error\"",
+        "location": {
+          "line": 150,
+          "column": 12
+        }
+      },
+      {
+        "id": "descriptiveness-21-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"analysis\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"analysis\"",
+        "location": {
+          "line": 21,
+          "column": 11
+        }
+      },
+      {
+        "id": "descriptiveness-97-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"metrics\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"metrics\"",
+        "location": {
+          "line": 97,
+          "column": 11
+        }
+      },
+      {
+        "id": "descriptiveness-138-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"suggestions\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"suggestions\"",
+        "location": {
+          "line": 138,
+          "column": 11
+        }
+      },
+      {
+        "id": "descriptiveness-140-26",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"suggestion\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"suggestion\"",
+        "location": {
+          "line": 140,
+          "column": 26
+        }
+      },
+      {
+        "id": "descriptiveness-145-11",
+        "principle": "naming",
+        "severity": "medium",
+        "description": "Name \"summary\" is not descriptive enough",
+        "suggestion": "Use a more descriptive name that clearly indicates the purpose of \"summary\"",
+        "location": {
+          "line": 145,
+          "column": 11
+        }
+      }
+    ],
+    "criticalIssues": []
+  },
+  "recommendations": {
+    "totalRecommendations": 3,
+    "quickWins": [
+      "Improve variable and function naming for better clarity"
+    ],
+    "highImpact": [
+      "Break down large functions and reduce complexity"
+    ],
+    "longTerm": [
+      "Implement proper error handling and validation"
+    ]
+  },
+  "trends": {
+    "improvementOpportunities": [
+      "Focus on naming improvements across the codebase"
+    ],
+    "strengths": [],
+    "riskAreas": []
+  },
+  "generatedAt": "2025-08-15T18:33:53.051Z"
+}

@@ -1,0 +1,4 @@
+File Path,Overall Score,Quality Grade,Total Violations,Critical Violations,High Violations,Medium Violations,Low Violations,Cyclomatic Complexity,Cognitive Complexity,Line Count,Maintainability,Testability,Readability
+"/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/naming-analysis-demo.ts",0.78,C,12,0,0,12,0,1,1,0,8,6,7
+"/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/quality-assessment-demo.ts",0.78,C,9,0,0,9,0,1,1,0,8,6,7
+"/Users/teroleinonen/software projects/Kin Workspace/clean-code-analyzer/examples/violation-detection-demo.ts",0.74,C,12,0,1,9,2,1,1,0,7,6,7
