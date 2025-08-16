@@ -5,6 +5,7 @@ import { QualityTrendChart } from './QualityTrendChart';
 import { ViolationsPieChart } from './ViolationsPieChart';
 import { FileQualityTable } from './FileQualityTable';
 import { RecentActivity } from './RecentActivity';
+import { DrillDownView } from './DrillDownView';
 import { WebSocketService } from '../services/WebSocketService';
 
 interface DashboardProps {
@@ -15,6 +16,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData }) => {
   const [data, setData] = useState<DashboardData | null>(initialData || null);
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
+  const [showDrillDown, setShowDrillDown] = useState(false);
   const [wsService] = useState(() => new WebSocketService());
 
   useEffect(() => {
@@ -123,6 +125,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData }) => {
                 </div>
               )}
               <button
+                type="button"
+                onClick={() => setShowDrillDown(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+              >
+                Detailed Analysis
+              </button>
+              <button
+                type="button"
                 onClick={handleRefresh}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
@@ -156,6 +166,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData }) => {
           </div>
         </div>
       </main>
+
+      {/* Drill Down Modal */}
+      {showDrillDown && data && (
+        <DrillDownView 
+          files={data.fileQuality}
+          onClose={() => setShowDrillDown(false)}
+        />
+      )}
     </div>
   );
 };

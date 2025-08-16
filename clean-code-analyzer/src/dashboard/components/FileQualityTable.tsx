@@ -3,9 +3,10 @@ import { FileQuality } from '../types';
 
 interface FileQualityTableProps {
   files: FileQuality[];
+  onFileSelect?: (file: FileQuality) => void;
 }
 
-export const FileQualityTable: React.FC<FileQualityTableProps> = ({ files }) => {
+export const FileQualityTable: React.FC<FileQualityTableProps> = ({ files, onFileSelect }) => {
   const [sortField, setSortField] = useState<keyof FileQuality>('score');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [filterScore, setFilterScore] = useState<number | null>(null);
@@ -121,6 +122,9 @@ export const FileQualityTable: React.FC<FileQualityTableProps> = ({ files }) => 
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Top Issues
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -176,6 +180,17 @@ export const FileQualityTable: React.FC<FileQualityTableProps> = ({ files }) => 
                       </div>
                     )}
                   </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {onFileSelect && (
+                    <button
+                      type="button"
+                      onClick={() => onFileSelect(file)}
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      View Details
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

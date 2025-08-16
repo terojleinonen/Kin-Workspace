@@ -117,7 +117,7 @@
     - Write component tests for dashboard functionality
     - _Requirements: 1.3, 6.4_
 
-  - [ ] 7.2 Build detailed drill-down views
+  - [x] 7.2 Build detailed drill-down views
     - Create file explorer component with quality metrics display
     - Implement function-level detail views showing complexity and violations
     - Add violation browsing and filtering interface with search capabilities
