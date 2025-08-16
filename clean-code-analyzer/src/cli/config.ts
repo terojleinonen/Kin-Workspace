@@ -40,7 +40,14 @@ export const DEFAULT_CONFIG: AnalysisConfig = {
   include: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
   exclude: ['node_modules/**', 'dist/**', 'build/**', '**/*.test.*', '**/*.spec.*'],
   
-  principles: Object.values(CleanCodePrinciple),
+  principles: [
+    CleanCodePrinciple.NAMING,
+    CleanCodePrinciple.FUNCTIONS,
+    CleanCodePrinciple.CLASSES,
+    CleanCodePrinciple.COMMENTS,
+    CleanCodePrinciple.ERROR_HANDLING,
+    CleanCodePrinciple.SOLID_PRINCIPLES
+  ],
   minSeverity: Severity.LOW,
   
   thresholds: {

@@ -8,6 +8,7 @@
 export * from './analyzer';
 export * from './utils';
 export * from './cli';
+export * from './git';
 
 // Re-export specific types to avoid conflicts
 export {

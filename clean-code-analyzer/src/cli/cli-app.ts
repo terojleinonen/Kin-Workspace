@@ -11,6 +11,7 @@ import { ProgressIndicator } from './progress';
 import { BatchProcessor } from './batch-processor';
 import { createFormatter } from './formatters';
 import { VERSION } from '../index';
+import { GitService, HookInstaller, BranchComparator, CommitMessageAnalyzer, PRReporter, HookConfig } from '../git';
 
 export class CliApp {
   private program: Command;
@@ -80,6 +81,70 @@ export class CliApp {
         await this.handleConfigValidate(options);
       });
     
+    // Git commands
+    const gitCmd = this.program
+      .command('git')
+      .description('Git integration commands');
+
+    gitCmd
+      .command('install-hooks')
+      .description('Install Git hooks for quality checks')
+      .option('--pre-commit', 'Install pre-commit hook', true)
+      .option('--commit-msg', 'Install commit-msg hook', true)
+      .option('--pre-push', 'Install pre-push hook', false)
+      .option('--config <path>', 'Hook configuration file')
+      .action(async (options) => {
+        await this.handleInstallHooks(options);
+      });
+
+    gitCmd
+      .command('uninstall-hooks')
+      .description('Uninstall Git hooks')
+      .action(async () => {
+        await this.handleUninstallHooks();
+      });
+
+    gitCmd
+      .command('hook-status')
+      .description('Show Git hook installation status')
+      .action(async () => {
+        await this.handleHookStatus();
+      });
+
+    gitCmd
+      .command('check-commit')
+      .description('Check commit message quality')
+      .argument('[message]', 'Commit message to check (reads from stdin if not provided)')
+      .option('--conventional', 'Enforce conventional commit format', true)
+      .option('--max-length <number>', 'Maximum subject length', '50')
+      .action(async (message, options) => {
+        await this.handleCheckCommit(message, options);
+      });
+
+    gitCmd
+      .command('compare-branches')
+      .description('Compare code quality between branches')
+      .argument('<base>', 'Base branch name')
+      .argument('[target]', 'Target branch name (default: current branch)')
+      .option('-f, --format <format>', 'Output format (console, json, markdown)', 'console')
+      .option('-o, --output <file>', 'Output file path')
+      .action(async (base, target, options) => {
+        await this.handleCompareBranches(base, target, options);
+      });
+
+    gitCmd
+      .command('pr-report')
+      .description('Generate pull request quality report')
+      .argument('<base>', 'Base branch name')
+      .argument('[head]', 'Head branch name (default: current branch)')
+      .option('--title <title>', 'Pull request title')
+      .option('--number <number>', 'Pull request number')
+      .option('-f, --format <format>', 'Output format (github, gitlab, json, text)', 'github')
+      .option('-o, --output <file>', 'Output file path')
+      .action(async (base, head, options) => {
+        await this.handlePRReport(base, head, options);
+      });
+
     // Info command
     this.program
       .command('info')
@@ -199,6 +264,239 @@ export class CliApp {
   }
   
   /**
+   * Handle install hooks command
+   */
+  private async handleInstallHooks(options: any): Promise<void> {
+    try {
+      const gitService = new GitService();
+      const installer = new HookInstaller(gitService);
+      
+      const config = {
+        preCommit: { enabled: options.preCommit },
+        commitMsg: { enabled: options.commitMsg },
+        prePush: { enabled: options.prePush }
+      } as Partial<HookConfig>;
+      
+      await installer.installHooks(config);
+      console.log(chalk.green('✅ Git hooks installed successfully'));
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(chalk.red('Error:'), `Failed to install hooks: ${errorMessage}`);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle uninstall hooks command
+   */
+  private async handleUninstallHooks(): Promise<void> {
+    try {
+      const gitService = new GitService();
+      const installer = new HookInstaller(gitService);
+      
+      await installer.uninstallHooks();
+      console.log(chalk.green('✅ Git hooks uninstalled successfully'));
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(chalk.red('Error:'), `Failed to uninstall hooks: ${errorMessage}`);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle hook status command
+   */
+  private async handleHookStatus(): Promise<void> {
+    try {
+      const gitService = new GitService();
+      const installer = new HookInstaller(gitService);
+      
+      const status = installer.getHookStatus();
+      
+      console.log(chalk.bold('Git Hook Status:'));
+      console.log(chalk.gray('='.repeat(20)));
+      
+      Object.entries(status).forEach(([hook, installed]) => {
+        const icon = installed ? chalk.green('✅') : chalk.red('❌');
+        const statusText = installed ? 'Installed' : 'Not installed';
+        console.log(`${icon} ${hook}: ${statusText}`);
+      });
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(chalk.red('Error:'), `Failed to check hook status: ${errorMessage}`);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle check commit command
+   */
+  private async handleCheckCommit(message: string | undefined, options: any): Promise<void> {
+    try {
+      let commitMessage = message;
+      
+      // Read from stdin if no message provided
+      if (!commitMessage) {
+        const stdin = process.stdin;
+        stdin.setEncoding('utf8');
+        
+        let data = '';
+        for await (const chunk of stdin) {
+          data += chunk;
+        }
+        commitMessage = data.trim();
+      }
+      
+      if (!commitMessage) {
+        console.error(chalk.red('Error:'), 'No commit message provided');
+        process.exit(1);
+      }
+      
+      const analyzer = new CommitMessageAnalyzer({
+        enforceConventionalCommits: options.conventional,
+        maxSubjectLength: parseInt(options.maxLength, 10)
+      });
+      
+      const analysis = analyzer.analyzeMessage(commitMessage);
+      
+      console.log(chalk.bold('Commit Message Analysis:'));
+      console.log(chalk.gray('='.repeat(30)));
+      console.log(`Score: ${chalk.cyan(analysis.score)}/100`);
+      
+      if (analysis.type) {
+        console.log(`Type: ${chalk.cyan(analysis.type)}`);
+      }
+      if (analysis.scope) {
+        console.log(`Scope: ${chalk.cyan(analysis.scope)}`);
+      }
+      
+      if (analysis.issues.length > 0) {
+        console.log(chalk.bold('\nIssues:'));
+        analysis.issues.forEach(issue => {
+          const icon = issue.severity === 'error' ? chalk.red('❌') : 
+                      issue.severity === 'warning' ? chalk.yellow('⚠️') : chalk.blue('ℹ️');
+          console.log(`${icon} ${issue.message}`);
+        });
+      }
+      
+      if (analysis.suggestions.length > 0) {
+        console.log(chalk.bold('\nSuggestions:'));
+        analysis.suggestions.forEach(suggestion => {
+          console.log(`${chalk.blue('💡')} ${suggestion}`);
+        });
+      }
+      
+      if (analysis.score < 80) {
+        process.exit(1);
+      }
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(chalk.red('Error:'), `Failed to analyze commit message: ${errorMessage}`);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle compare branches command
+   */
+  private async handleCompareBranches(base: string, target: string | undefined, options: any): Promise<void> {
+    try {
+      const gitService = new GitService();
+      const config = this.loadConfig();
+      const comparator = new BranchComparator(gitService, config);
+      
+      const targetBranch = target || gitService.getCurrentBranch();
+      
+      console.log(chalk.blue('🔍'), `Comparing ${chalk.cyan(targetBranch)} with ${chalk.cyan(base)}...`);
+      
+      const comparison = await comparator.compareBranches(base, targetBranch);
+      
+      if (options.format === 'json') {
+        const output = JSON.stringify(comparison, null, 2);
+        if (options.output) {
+          require('fs').writeFileSync(options.output, output);
+          console.log(chalk.green('✅'), `Report saved to ${options.output}`);
+        } else {
+          console.log(output);
+        }
+      } else if (options.format === 'markdown') {
+        const report = comparator.generateComparisonReport(comparison);
+        if (options.output) {
+          require('fs').writeFileSync(options.output, report);
+          console.log(chalk.green('✅'), `Report saved to ${options.output}`);
+        } else {
+          console.log(report);
+        }
+      } else {
+        // Console format
+        console.log(comparator.generateComparisonReport(comparison));
+      }
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(chalk.red('Error:'), `Failed to compare branches: ${errorMessage}`);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle PR report command
+   */
+  private async handlePRReport(base: string, head: string | undefined, options: any): Promise<void> {
+    try {
+      const gitService = new GitService();
+      const config = this.loadConfig();
+      const comparator = new BranchComparator(gitService, config);
+      const reporter = new PRReporter(comparator);
+      
+      const headBranch = head || gitService.getCurrentBranch();
+      
+      console.log(chalk.blue('📊'), `Generating PR report for ${chalk.cyan(headBranch)} → ${chalk.cyan(base)}...`);
+      
+      const report = await reporter.generateReport(base, headBranch, options.title, options.number);
+      
+      let output: string;
+      switch (options.format) {
+        case 'github':
+          output = reporter.formatForGitHub(report);
+          break;
+        case 'gitlab':
+          output = reporter.formatForGitLab(report);
+          break;
+        case 'json':
+          output = reporter.formatAsJSON(report);
+          break;
+        case 'text':
+          output = reporter.formatAsText(report);
+          break;
+        default:
+          output = reporter.formatForGitHub(report);
+      }
+      
+      if (options.output) {
+        require('fs').writeFileSync(options.output, output);
+        console.log(chalk.green('✅'), `PR report saved to ${options.output}`);
+      } else {
+        console.log(output);
+      }
+      
+      // Exit with error code if blocked
+      if (report.approvalStatus === 'blocked') {
+        process.exit(1);
+      }
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(chalk.red('Error:'), `Failed to generate PR report: ${errorMessage}`);
+      process.exit(1);
+    }
+  }
+
+  /**
    * Handle info command
    */
   private handleInfo(): void {
@@ -219,6 +517,12 @@ export class CliApp {
     console.log('  - json');
     console.log('  - csv');
     console.log('  - html');
+    
+    console.log(chalk.bold('\nGit Integration:'));
+    console.log('  - Pre-commit quality checks');
+    console.log('  - Commit message analysis');
+    console.log('  - Branch quality comparison');
+    console.log('  - Pull request reports');
   }
   
   /**

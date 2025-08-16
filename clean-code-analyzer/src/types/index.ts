@@ -239,3 +239,46 @@ export interface TeamComparisonData {
   improvementRate: number;
   roi: number;
 }
+
+// Batch processing types
+export interface BatchAnalysisResult {
+  totalFiles: number;
+  processedFiles: number;
+  failedFiles: string[];
+  analysisResults: FileAnalysisResult[];
+  summary: AnalysisSummary;
+}
+
+export interface FileAnalysisResult {
+  filePath: string;
+  success: boolean;
+  error?: string;
+  metrics?: any;
+  violations?: any[];
+  recommendations?: any[];
+  functions?: FunctionInfo[];
+}
+
+export interface FunctionInfo {
+  name: string;
+  complexity: ComplexityMetrics;
+  lineCount: number;
+  parameterCount: number;
+}
+
+export interface AnalysisSummary {
+  totalViolations: number;
+  violationsBySeverity: Record<string, number>;
+  violationsByPrinciple: Record<string, number>;
+  averageScore: number;
+  filesWithIssues: number;
+}
+
+export interface QualityReport {
+  filePath: string;
+  overallScore: number;
+  principleScores: Map<CleanCodePrinciple, number>;
+  violations: Violation[];
+  strengths: string[];
+  functions?: FunctionInfo[];
+}
