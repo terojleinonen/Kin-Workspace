@@ -172,6 +172,7 @@ export const ViolationBrowser: React.FC<ViolationBrowserProps> = ({
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by severity level"
           >
             <option value="">All Severities</option>
             <option value="Critical">Critical</option>
@@ -184,6 +185,7 @@ export const ViolationBrowser: React.FC<ViolationBrowserProps> = ({
             value={principleFilter}
             onChange={(e) => setPrincipleFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by principle"
           >
             <option value="">All Principles</option>
             {uniquePrinciples.map(principle => (
@@ -199,6 +201,7 @@ export const ViolationBrowser: React.FC<ViolationBrowserProps> = ({
               setSortDirection(direction as 'asc' | 'desc');
             }}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Sort violations by"
           >
             <option value="severity-desc">Severity (High to Low)</option>
             <option value="severity-asc">Severity (Low to High)</option>

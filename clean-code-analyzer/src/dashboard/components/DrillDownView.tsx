@@ -44,8 +44,8 @@ export const DrillDownView: React.FC<DrillDownViewProps> = ({ files, onClose }) 
     if (showFileDetail && selectedFile) {
       return (
         <div className="h-full">
-          <FileDetailView 
-            file={selectedFile} 
+          <FileDetailView
+            file={selectedFile}
             onClose={handleCloseFileDetail}
           />
         </div>
@@ -65,8 +65,8 @@ export const DrillDownView: React.FC<DrillDownViewProps> = ({ files, onClose }) 
             </div>
             <div className="lg:col-span-2">
               {selectedFile ? (
-                <FileDetailView 
-                  file={selectedFile} 
+                <FileDetailView
+                  file={selectedFile}
                   onClose={() => setSelectedFile(null)}
                 />
               ) : (
@@ -81,23 +81,23 @@ export const DrillDownView: React.FC<DrillDownViewProps> = ({ files, onClose }) 
             </div>
           </div>
         );
-      
+
       case 'violations':
         return (
-          <ViolationBrowser 
+          <ViolationBrowser
             files={files}
             onViolationSelect={handleViolationSelect}
           />
         );
-      
+
       case 'recommendations':
         return (
-          <RecommendationQueue 
+          <RecommendationQueue
             files={files}
             onRecommendationSelect={handleRecommendationSelect}
           />
         );
-      
+
       default:
         return null;
     }
@@ -117,13 +117,15 @@ export const DrillDownView: React.FC<DrillDownViewProps> = ({ files, onClose }) 
               type="button"
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Close code quality analysis"
+              title="Close"
             >
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          
+
           {/* Navigation Tabs */}
           <div className="mt-6">
             <nav className="flex space-x-8">
@@ -140,11 +142,10 @@ export const DrillDownView: React.FC<DrillDownViewProps> = ({ files, onClose }) 
                     setShowFileDetail(false);
                     setSelectedFile(null);
                   }}
-                  className={`flex items-center space-x-2 py-2 px-4 border-b-2 font-medium text-sm transition-colors ${
-                    viewMode === tab.id
+                  className={`flex items-center space-x-2 py-2 px-4 border-b-2 font-medium text-sm transition-colors ${viewMode === tab.id
                       ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
                   <span>{tab.icon}</span>
                   <span>{tab.label}</span>

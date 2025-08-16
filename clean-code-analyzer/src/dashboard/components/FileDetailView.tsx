@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileQuality, Violation, QualityMetrics } from '../types';
+import { FileQuality, Violation } from '../types';
 
 interface FunctionInfo {
   name: string;
@@ -18,7 +18,7 @@ interface FileDetailViewProps {
 
 export const FileDetailView: React.FC<FileDetailViewProps> = ({ file, onClose }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'functions' | 'violations'>('overview');
-  
+
   // Mock function data - in real implementation, this would come from the analysis engine
   const mockFunctions: FunctionInfo[] = [
     {
@@ -112,14 +112,12 @@ export const FileDetailView: React.FC<FileDetailViewProps> = ({ file, onClose })
             <div key={metric} className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700">{metric}</span>
               <div className="flex items-center space-x-2">
-                <div className="w-32 bg-gray-200 rounded-full h-2">
+                <div className="w-32 bg-gray-200 rounded-full h-2 relative overflow-hidden">
                   <div
-                    className={`h-2 rounded-full ${
-                      value >= 8 ? 'bg-green-500' :
+                    className={`h-2 rounded-full absolute left-0 top-0 transition-all duration-300 ${value >= 8 ? 'bg-green-500' :
                       value >= 6 ? 'bg-yellow-500' :
-                      value >= 4 ? 'bg-orange-500' : 'bg-red-500'
-                    }`}
-                    style={{ width: `${(value / 10) * 100}%` }}
+                        value >= 4 ? 'bg-orange-500' : 'bg-red-500'
+                      } w-[${Math.min(100, Math.max(0, (value / 10) * 100))}%]`}
                   />
                 </div>
                 <span className={`text-sm font-semibold ${getScoreColor(value)}`}>
@@ -139,11 +137,10 @@ export const FileDetailView: React.FC<FileDetailViewProps> = ({ file, onClose })
             const count = file.violations.filter(v => v.severity === severity).length;
             return (
               <div key={severity} className="text-center">
-                <div className={`text-2xl font-bold ${
-                  severity === 'Critical' ? 'text-red-600' :
+                <div className={`text-2xl font-bold ${severity === 'Critical' ? 'text-red-600' :
                   severity === 'High' ? 'text-orange-600' :
-                  severity === 'Medium' ? 'text-yellow-600' : 'text-blue-600'
-                }`}>
+                    severity === 'Medium' ? 'text-yellow-600' : 'text-blue-600'
+                  }`}>
                   {count}
                 </div>
                 <div className="text-sm text-gray-600">{severity}</div>
@@ -232,9 +229,9 @@ export const FileDetailView: React.FC<FileDetailViewProps> = ({ file, onClose })
               Line {violation.location.line}:{violation.location.column}
             </span>
           </div>
-          
+
           <p className="text-gray-900 mb-3">{violation.description}</p>
-          
+
           <div className="bg-blue-50 border-l-4 border-blue-400 p-3">
             <p className="text-sm text-blue-800">
               <strong>Suggestion:</strong> {violation.suggestion}
@@ -242,7 +239,7 @@ export const FileDetailView: React.FC<FileDetailViewProps> = ({ file, onClose })
           </div>
         </div>
       ))}
-      
+
       {file.violations.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           <div className="text-green-600 text-4xl mb-2">✅</div>
@@ -273,6 +270,8 @@ export const FileDetailView: React.FC<FileDetailViewProps> = ({ file, onClose })
             type="button"
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Close file detail view"
+            title="Close"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -293,11 +292,10 @@ export const FileDetailView: React.FC<FileDetailViewProps> = ({ file, onClose })
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               {tab.label}
             </button>

@@ -277,6 +277,7 @@ export const RecommendationQueue: React.FC<RecommendationQueueProps> = ({
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by status"
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -289,6 +290,7 @@ export const RecommendationQueue: React.FC<RecommendationQueueProps> = ({
             value={effortFilter}
             onChange={(e) => setEffortFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by effort level"
           >
             <option value="">All Efforts</option>
             <option value="Small">Small</option>
@@ -300,6 +302,7 @@ export const RecommendationQueue: React.FC<RecommendationQueueProps> = ({
             value={impactFilter}
             onChange={(e) => setImpactFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by impact level"
           >
             <option value="">All Impacts</option>
             <option value="High">High Impact</option>
@@ -311,6 +314,7 @@ export const RecommendationQueue: React.FC<RecommendationQueueProps> = ({
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Sort recommendations by"
           >
             <option value="priority">Sort by Priority</option>
             <option value="effort">Sort by Effort</option>
