@@ -1,0 +1,27 @@
+{
+  "sourceDir": "src",
+  "qualityGates": {
+    "minimumScore": 75,
+    "maxCriticalViolations": 0,
+    "minTestCoverage": 80,
+    "maxComplexity": 10,
+    "maxFunctionLength": 50
+  },
+  "notifications": {
+    "slack": {
+      "webhookUrl": "${SLACK_WEBHOOK_URL}",
+      "channel": "#code-quality",
+      "onlyOnFailure": true
+    },
+    "email": {
+      "recipients": ["${QUALITY_ALERT_EMAILS}"],
+      "smtpConfig": {
+        "host": "smtp.gmail.com",
+        "port": 587,
+        "username": "${EMAIL_USERNAME}",
+        "password": "${EMAIL_PASSWORD}"
+      },
+      "onlyOnRegression": true
+    }
+  }
+}

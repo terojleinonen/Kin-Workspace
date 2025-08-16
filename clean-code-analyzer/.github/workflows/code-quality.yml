@@ -1,0 +1,135 @@
+name: Code Quality Analysis
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  quality-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for comparison
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build project
+      run: npm run build
+    
+    - name: Run tests
+      run: npm test
+    
+    - name: Run quality analysis
+      id: quality-check
+      run: |
+        npm run analyze:ci
+        echo "quality-score=$(cat quality-score.txt)" >> $GITHUB_OUTPUT
+    
+    - name: Quality gate check
+      env:
+        QUALITY_THRESHOLD: ${{ vars.QUALITY_THRESHOLD || '75' }}
+        QUALITY_SCORE: ${{ steps.quality-check.outputs.quality-score }}
+      run: |
+        if (( $(echo "$QUALITY_SCORE < $QUALITY_THRESHOLD" | bc -l) )); then
+          echo "Quality score $QUALITY_SCORE is below threshold $QUALITY_THRESHOLD"
+          exit 1
+        fi
+        echo "Quality gate passed: $QUALITY_SCORE >= $QUALITY_THRESHOLD"
+    
+    - name: Compare with base branch
+      if: github.event_name == 'pull_request'
+      run: |
+        git checkout ${{ github.event.pull_request.base.sha }}
+        npm run analyze:baseline
+        git checkout ${{ github.sha }}
+        npm run analyze:compare
+    
+    - name: Upload quality report
+      uses: actions/upload-artifact@v4
+      with:
+        name: quality-report-${{ github.sha }}
+        path: |
+          reports/
+          quality-*.json
+    
+    - name: Comment PR with quality results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('quality-comparison.json', 'utf8'));
+          
+          const comment = `## 🔍 Code Quality Analysis
+          
+          **Overall Score:** ${report.currentScore} (${report.scoreDelta > 0 ? '+' : ''}${report.scoreDelta})
+          
+          ### Quality Changes
+          ${report.improvements.map(i => `✅ ${i}`).join('\n')}
+          ${report.regressions.map(r => `❌ ${r}`).join('\n')}
+          
+          ### Recommendations
+          ${report.recommendations.slice(0, 5).map(r => `- ${r.description}`).join('\n')}
+          
+          [View full report](${report.reportUrl})`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  notify-results:
+    needs: quality-analysis
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify Slack on failure
+      if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        channel: '#code-quality'
+        text: |
+          🚨 Code quality check failed on ${{ github.ref }}
+          Commit: ${{ github.sha }}
+          Author: ${{ github.actor }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    - name: Send email notification
+      if: failure() && github.ref == 'refs/heads/main'
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "Code Quality Alert - ${{ github.repository }}"
+        to: ${{ vars.QUALITY_ALERT_EMAILS }}
+        from: "Code Quality Bot <noreply@example.com>"
+        body: |
+          Code quality check failed on main branch.
+          
+          Repository: ${{ github.repository }}
+          Commit: ${{ github.sha }}
+          Author: ${{ github.actor }}
+          
+          Please review the quality report and address any critical issues.
