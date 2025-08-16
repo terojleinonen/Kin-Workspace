@@ -278,7 +278,7 @@ export class CIIntegration {
    * Get source files from directory
    */
   private async getSourceFiles(sourceDir: string): Promise<string[]> {
-    const glob = require('glob');
+    const { glob } = require('glob');
     return new Promise((resolve, reject) => {
       glob(`${sourceDir}/**/*.{ts,js,tsx,jsx}`, { ignore: ['**/node_modules/**', '**/dist/**'] }, (err: any, files: string[]) => {
         if (err) reject(err);

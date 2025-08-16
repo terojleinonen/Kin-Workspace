@@ -2,9 +2,10 @@ import { NotificationService } from '../../src/ci/notification-service';
 import { NotificationConfig, QualityComparison, TrendData } from '../../src/ci/types';
 import * as https from 'https';
 // Mock nodemailer at module level
-jest.mock('nodemailer', () => ({
+const mockNodemailer = {
   createTransporter: jest.fn()
-}));
+};
+jest.mock('nodemailer', () => mockNodemailer);
 
 // Mock dependencies
 jest.mock('https');
@@ -89,8 +90,7 @@ describe('NotificationService', () => {
       const mockTransporter = {
         sendMail: jest.fn().mockResolvedValue({ messageId: 'test' })
       };
-      const nodemailer = require('nodemailer');
-      nodemailer.createTransporter.mockReturnValue(mockTransporter);
+      mockNodemailer.createTransporter.mockReturnValue(mockTransporter);
 
       await notificationService.notifyRegression(mockComparison);
 

@@ -45,7 +45,7 @@ jobs:
         QUALITY_THRESHOLD: ${{ vars.QUALITY_THRESHOLD || '75' }}
         QUALITY_SCORE: ${{ steps.quality-check.outputs.quality-score }}
       run: |
-        if (( $(echo "$QUALITY_SCORE < $QUALITY_THRESHOLD" | bc -l) )); then
+        if (( $(echo "$QUALITY_SCORE < $QUALITY_THRESHOLD" | awk '{print ($1 < $2)}') )); then
           echo "Quality score $QUALITY_SCORE is below threshold $QUALITY_THRESHOLD"
           exit 1
         fi
